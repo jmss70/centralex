@@ -108,7 +108,7 @@ d <- d %>% filter(centers=="01")
 
 ```{r}
 dd <- displex_availability(d)
-dd %>% arrange(-availability) %>% ggplot(aes(x=seq_along(words),y=availability)) + geom_line() + facet_wrap(~centers)
+dd %>% arrange(-availability) %>% ggplot(aes(x=seq_along(words),y=availability)) + geom_line()
 ```
 
 Es posible observar que, puesto que el proceso de la suma probabilística es siempre no decreciente, es decir, la adición de nuevos valores nunca disminuye el valor "acumulado", puede ocurrir que, al realizar la agregación, _demasiados_ valores se hagan indistinguibles de 1.

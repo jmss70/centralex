@@ -56,7 +56,7 @@ displex_availability <- function(data,law=displex_exp_law, reduce=displex_additi
   }
   centers     = rep(data$centers, vapply(data$words, FUN = function(x) length(x), FUN.VALUE = 0L))
   d <- data.frame(centers=centers, words=words, availability=availability)
-  d %>% group_by(centers,words) %>% summarise(availability=reduce(availability))
+  d %>% group_by(centers,words) %>% summarise(availability=reduce(availability)) %>% ungroup()
 }
 
 
