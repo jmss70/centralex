@@ -4,30 +4,57 @@ output:
   pdf_document: default
   html_notebook: default
 ---
-# Modelos de datos
 
-Hay varios trabajos y modelos que se han ido refinando progresivamente para responder a la cuestión de la relevancia del vocabulario. En este trabajo se intenta estudiar el modelo subyacente a tales aproximaciones y se propone una generalización para la construcción de un modelo general que permita representar de la forma más ajustada y abierta posible la evaluación de los modelos de disponibilidad.
+En este artículo se presenta una implementación sobre el sistema de análisis estadístico R para el estudio de la disponibilidad léxica. Se ha optado por hacer la herramienta disponible mediante el repositorio GitHub.com, que permite la creación de adaptaciones y permitirá que este proyecto pueda avanzar, haciendolo disponible publicamente, tanto a nivel de uso como de implementación.
 
-Para ello, este documento se establece como un ejemplo de aplicación de la librería que se ha utilizado para este trabajo, así como de discusión y justificación de las propuestas anteriores y presentes.
+Se ha optado por hacer una exposición que, simultáneamente, sea un ejemplo de uso. Creemos que de esta forma la exposición se hará más amena y útil para el que quiera aplicar las herramientas que proporcionamos.
 
+# Instalación
+
+Como se comenta arriba, se ha optado por el uso del repositorio GitHub.com. Esto implica que el usuario debe llevar a cabo un pequeño paso de instalación que, en nuestra opinión, no es más complejo que cualquier proceso de instalación en el sistema R. Este paso ha de hacerse únicamente cuando se pretenda instalar o actualizar el paquete en el sistema. Puesto que nuestra intención es seguir trabajando en el paquete, sería recomendable realizar esta acción de forma periódica.
+
+Las siguientes órdenes instalan el paquete Displex del repositorio GitHub. Todo el código está implementado en R, con lo que es fácil de revisar.
 ```{r}
-install.packages("devtool")
-library(devtools)
-install.packages("tidyverse")
-install_github("jmss70/displex")
+# install.packages("devtools")
 ```
 
-
 ```{r}
-install.packages("devtools")
+# library(devtools)
+# install_github("jmss70/displex")
+```
+
+Se recomienda el uso del universo TidyVerse para el análisis de datos, ya que proporciona herramientas con una sintaxis muy potente que facilita enormemente la tarea de análisis y representación de datos.
+```{r}
+# install.packages("tidyverse")
+```
+
+Llevados a cabo los pasos anteriores, y si no se ha producido ningún contratiempo, el sistema está preparado para llevar a cabo el trabajo.
+
+# Carga de las librerías y los datos
+
+Para poder usar las librerías hay que cargarlas en nuestra sesión de trabajo, poniendo a nuestra disposición las funciones que proporcionan:
+```{r}
 library(tidyverse)
 library(displex)
 ```
 
-Se ha construido una función que carga los datos en la forma que es habitual representar en este tipo de estudios
+Para cargar los datos, se espera que estén en un determinado formato, utilizado por ser el que habitualmente se encuentra en este tipo de estudios, creemos que por razones históricas. Sin embargo, consideramos que son redundantes y que habría que estudiar, en un futuro cercano, establecer un estandard de codificación que sea más coherente con los modelos de datos normalizados.
+
+Se espera que los datos estén en un archivo de texto, con campos separados por espacios:
+- Un campo de información del hablante
+- Un campo de identificación de usuario
+- Un campo de identificación de centro de interés
+- Una lista de palabras separadas por comas y en orden de realización
+
+Un ejemplo de dos líneas sería:
+
+    21131 001 01 mano, pie, brazo, cerebro, pulmón, nariz, extremidad, ojo, boca, diente, pelo, oreja, culo, vagina 
+    12131 002 01 riñón, corazón, garganta, cabeza, pierna, pie, hígado, estómago, mano, brazo, antebrazo, abdomen, pecho, ojo, boca, oído, dedo, rodilla, costilla 
+
+Suponiendo que tenemos todos los datos cargados en un archivo, denominado `datos.txt`, que estará alojado en el mismo directorio que el script de procesamiento, se podrían cargar los datos como:
 
 ```{r}
-d <- read.displex("../datos.txt")
+d <- read.displex("datos.txt")
 head(d)
 ```
 Para cada usuario y centro de interés se carga una lista de palabras en el orden en el que se ha realizado
@@ -35,83 +62,68 @@ Para cada usuario y centro de interés se carga una lista de palabras en el orde
 d[1,]$words
 ```
 
+# Modelo de datos
 
-Se ha puesto a disposición una función, displex_availability, que permite integrar la información del marco de datos de una forma general y que permite el uso de diferentes paradigmas, que se desarrollarán y discutirán a continuación.
+Diversos trabajos han propuesto modelos que se han ido refinando progresivamente para responder a la cuestión de la relevancia del vocabulario.Tras estudiar el modelo subyacente a tales aproximaciones, se propone una generalización para la construcción de un modelo general que permita representar de la forma más ajustada y abierta posible la evaluación de los modelos de disponibilidad.
 
-Algunos ejemplos de aplicación para el cálculo de la disponibilidad aplicando diferentes modelos. En todos ellos se añade la representación de las curvas de disponibilidad (en orden decreciente) para los diferentes centros de interés que se han tenido en cuenta.
+La fórmula de cálculo de disponibilidad más comunmente aceptada es la propuesta por López-Strassburguer, que se evalúa como:
+$$D(P_j) = \sum_{i=1}^n e^{-2.3 \frac{i-1}{n-1}} \frac{f_{ij}}{I_1}$$
+donde $n$ corresponde a la máxima posición alcanzada, $i$ representa cada posición alcanzada por un término, $j$ es índice del término a evaluar, $f_{ij}$ corresponde al número de veces que aparece el término $j$-ésimo en la posición $i$-ésima, $e$ es el número de Euler ($2.718282...$), $I_1$ es el número de informantes. Obsérvese que, una vez recogidos los datos, los únicos valores variables durante la evaluación son $j$ (índice del término), $i$ (cada posición) y $f_{ij}$ (las veces que aparece el término $j$-ésimo en la posición $i$-ésima).
 
-## Ejemplo 1
+Mediante unas operaciones de álgebra simple, se puede reescribir la expresión como:
+$$D(P_j) = \sum_{i=1}^n e^{-2.3 \frac{i-1}{n-1}} \frac{f_{ij}}{I_1} = \frac{1}{I_1}\sum_{i=1}^n e^{-2.3 \frac{i-1}{n-1}} f_{ij} = \frac{1}{I_1}\sum_{i=1}^n \sum_{k=1}^{f_{ij}} e^{-2.3 \frac{i-1}{n-1}} $$
+Así, la fórmula de López-Strassburger se puede reinterpretar como la evaluación mediante la función $e^{-2.3 \frac{i-1}{n-1}}$ de la aparición de cada término en cada posición, donde $i$ es la posición del término, y $n$, $I_1$, $e$ y $-2.3$ son valores fijos. Las evaluaciones de cada término en las diferentes posiciones se acumulan para todas las veces que el valor aparece en esa posición, $\sum_{k=1}^{f_{ij}}$, y en todas las posiciones, $\sum_{i=1}^n$, normalizándose posteriormente el valor mediante un valor fijo, que es el número de informantes, $I_1$.
 
-Valores por defecto (que no por ellos más relevantes) proporcionados por las librerías. Se aplica una ley de Zipf como ley de evaluación de cada prueba y la agregación aditiva como modelo de agregacióin de los datos.
+Por tanto, la fórmula de López-Strassburger corresponde a una evaluación de cada término en cada posición en la que aparece, entre los distintos participantes del experimento, y un procedimiento de aglutinación de esa información para proporcionar una cualificación global para el término.
+
+En un trabajo previo, se propuso un método alternativo para el cálculo de la disponibilidad. Se procedió a evaluar cada realización de cada término por cada hablante mediante una función de Zipf-Mandelbrot
+$$\frac{k}{i}$$
+con un parámetro $k$ a determinar (hay en preparación un trabajo en el que se discuten estos parámetros, su función y necesidad) y se integraba la información proporcionada por cada muestra a las ya evaluadas mediante una ley probablística:
+$$a+b-a\cdot b$$
+que, generalizada a todo el experimento y expresada de forma equivalente a la fórmula de López-Strassburger, quedaría como:
+$$D(P_j) = 1 - \Pi_{i=1}^{n}\Pi_{k=1}^{f_{ij}} \left(1-\frac ki\right),$$
+Como se puede observar, el modelo general es equivalente al propuesto por López-Strassburger. Lo que cambia son los procedimientos de evaluación e integración de las realizaciones de los hablantes. La razón para proponer una evaluación basada en la teoría de los conjuntos difusos es la de proporcionar un marco teórico en la que integrar la evaluación realizada.
+
+
+En lugar de proporcionar un modelo de evaluación prefijado, se va a proponer un conjunto de herramientas, con opciones prefijadas, que permitan la evaluación de diferentes aproximaciones. Aunque tengamos nuestras preferencias, debido a nuestra percepción personal del problema de la determinación de la disponibilidad léxica, creemos que es importante ofrecer herramientas flexibles que permitan evaluaciones con modelos alternativos que ayuden a discutir y desarrollar alternativas.
+
+Para ello, se proporciona la función `displex_availability`, que permite integrar la información construida a partir de los datos cargados mediante la función `read.displex`, proporcionando una evaluación de la disponibilidad de cada término en cada centro de interés. Esta función es parametrizable para poder integrar diferentes modelos de evaluación y de aglutinación.
+
+
+Con la librería se proporcionan tres modelos de evaluación de las realizaciones (valor asignado inicialmente a cada térmnino para cada hablante y centro de realización, en función de su posición):
+
+* Una ley de Zipf-Mandelbrot generalizada, `displex_zipf_law`, $$\frac k{(i+d)^a},$$ una ley tradicionalmente propuesta para el uso en la evaluación de la frecuencia del léxico y que se ha verificado experimentalmente en varias lenguas. El parámetro $i$ es la posición del vocablo, $d$ es un factor de desplazamiento que permite suavizar el inicio de la curva y el valor de $k$ corresponde a un factor de normalización. Los valores iniciales de la función son $k=1$, $d=0$ y $a=1$, con lo que correspondería a $1/i$.
+* Una ley exponencial generalizada, `displex_exp_law`, $$\frac k{a^{i+d}}$$ donde los valores por defecto son $a=2$, $k=1$ y $d=0$, correspondiendo entonces a $\frac 1{2^i}$.
+  
+Así mismo, se proporciona un un operador de agregación específico para la suma probabilística, `displex_additive_law`, aunque se podría utilizar cualquier operador de agregación que tenga disponible R, como `sum`, `mean`, etc.
+
+
+
+En los primeros ejemplos se considerará únicamente un centro de interés, para facilitar la representación. Más adelante se desarrollarán ejemplos con diversos centros de interés.
+```{r}
+d <- d %>% filter(centers=="01")
+```
+
+## Ejemplo 1. Modelo de aplicación simple: evaluación exponencial e integración mediante suma probabilística
 
 ```{r}
 dd <- displex_availability(d)
 dd %>% arrange(-availability) %>% ggplot(aes(x=seq_along(words),y=availability)) + geom_line() + facet_wrap(~centers)
 ```
 
+Es posible observar que, puesto que el proceso de la suma probabilística es siempre no decreciente, es decir, la adición de nuevos valores nunca disminuye el valor "acumulado", puede ocurrir que, al realizar la agregación, _demasiados_ valores se hagan indistinguibles de 1.
+
 ```{r}
-dd %>% filter(centers=="01") %>% arrange(-availability) %>% head(10)
+dd %>% filter(centers=="01") %>% arrange(-availability) %>% head(30)
 ```
-Es posible observar que hay grupos de valores, bastante extensos, que tienen disponibilidad 1.
-
-## Ejemplo 2
-
-Una ley de compatibilidad de cada prueba de Zipft, pero se usa como agregación una media. Se puede observar cómo cambian los rangos de los datos.
-
 ```{r}
-dd <- displex_availability(d,reduce=mean)
+dd <- displex_availability(d,law=function(x) {displex_exp_law(x,k=1/2)})
 dd %>% arrange(-availability) %>% ggplot(aes(x=seq_along(words),y=availability)) + geom_line() + facet_wrap(~centers)
 ```
 
-```{r}
-dd %>% filter(centers=="01") %>% arrange(-availability) %>% head(20)
-```
+## Ejemplo 1: Modelo de López-Strassburger
 
-## Ejemplo 3
-
-Una ley de compatibilidad de cada prueba de Zipft, que empieza por 1/2 (por defecto empieza por el valor 1), usando como agregación una media. Se puede observar cómo cambian los rangos de los datos.
-
-```{r}
-dd <- displex_availability(d,law=function(x) {displex_zipf_law(x,d=0)},reduce=mean)
-dd %>% arrange(-availability) %>% ggplot(aes(x=seq_along(words),y=availability)) + geom_line() + facet_wrap(~centers)
-```
-
-```{r}
-dd %>% filter(centers=="01") %>% arrange(-availability) %>% head(20)
-```
-
-## Ejemplo 4
-Una ley exponencial, $1/2^n$, con ley de agregación la media
-
-```{r}
-dd <- displex_availability(d,law=displex_exp_law,reduce=mean)
-dd %>% arrange(-availability) %>% ggplot(aes(x=seq_along(words),y=availability)) + geom_line() + facet_wrap(~centers)
-```
-
-`
-
-```{r}
-dd %>% filter(centers=="01") %>% arrange(-availability) %>% head(20)
-```
-
-## Ejemplo 5
-
-Una ley de agregación exponencial, con ley de agregación la adición probabilística
-
-```{r}
-dd <- displex_availability(d,law=displex_exp_law,reduce=displex_additive_law)
-dd %>% arrange(-availability) %>% ggplot(aes(x=seq_along(words),y=availability)) + geom_line() + facet_wrap(~centers)
-```
-
-```{r}
-nn <- dd %>% filter(centers=="01") %>% arrange(-availability)
-nn  %>% head(20)
-```
-```{r}
-dd %>% filter(centers=='01') %>% arrange(-availability) %>% ggplot(aes(x=seq_along(words),y=availability)) + geom_line() + facet_wrap(~centers)
-```
-
-## Un caso particular
+Como ejemplo inicial, consideremos el caso del modelo de López-Strassburger.
 
 La fórmula principalmente propuesta hasta ahora ha sido la que enunciaron Lopez-Strasburger, basada en el recuendo del número de veces que aparece una palabra en una determinada posición, e integrando esa información mediante una ponderación según una exponencial, con un parámetro que, generalmente, se evalúa como -2.3.
 
@@ -119,7 +131,7 @@ Este desarrollo se podría reconstruir como:
 
 
 ```{r}
-d <- read.displex("../datos.txt")
+d <- read.displex("datos.txt")
 d <- d %>% filter(centers=="01")
 # Recopilamos todas las palabras y sus posiciones en las listas
 words = c()
@@ -164,6 +176,70 @@ lopez_law <- function(w) {
 dd <- displex_availability(d,law=lopez_law,reduce=function (x) {sum(x) / N})
 dd %>% arrange(-availability) %>% head(40)
 ```
+
+
+
+
+## Ejemplo 1
+
+Valores por defecto (que no por ellos más relevantes) proporcionados por las librerías. Se aplica una ley de Zipf como ley de evaluación de cada prueba y la agregación aditiva como modelo de agregacióin de los datos.
+
+```{r}
+dd <- displex_availability(d)
+dd %>% arrange(-availability) %>% ggplot(aes(x=seq_along(words),y=availability)) + geom_line() + facet_wrap(~centers)
+```
+
+```{r}
+dd %>% filter(centers=="01") %>% arrange(-availability) %>% head(10)
+```
+Es posible observar que hay grupos de valores, bastante extensos, que tienen disponibilidad 1.
+
+## Ejemplo 2
+
+Una ley de compatibilidad de cada prueba de Zipft, pero se usa como agregación una media. Se puede observar cómo cambian los rangos de los datos.
+
+```{r}
+dd <- displex_availability(d,reduce=mean)
+dd %>% arrange(-availability) %>% ggplot(aes(x=seq_along(words),y=availability)) + geom_line() + facet_wrap(~centers)
+```
+
+```{r}
+dd %>% filter(centers=="01") %>% arrange(-availability) %>% head(20)
+```
+
+## Ejemplo 3
+
+Una ley de compatibilidad de cada prueba de Zipft, que empieza por 1/2 (por defecto empieza por el valor 1), usando como agregación una media. Se puede observar cómo cambian los rangos de los datos.
+
+```{r}
+dd <- displex_availability(d,law=function(x) {displex_zipf_law(x,d=0)},reduce=mean)
+dd %>% arrange(-availability) %>% ggplot(aes(x=seq_along(words),y=availability)) + geom_line() + facet_wrap(~centers)
+```
+
+```{r}
+dd %>% filter(centers=="01") %>% arrange(-availability) %>% head(20)
+```
+
+## Ejemplo 4
+
+## Ejemplo 5
+
+Una ley de agregación exponencial, con ley de agregación la adición probabilística
+
+```{r}
+dd <- displex_availability(d,law=displex_exp_law,reduce=displex_additive_law)
+dd %>% arrange(-availability) %>% ggplot(aes(x=seq_along(words),y=availability)) + geom_line() + facet_wrap(~centers)
+```
+
+```{r}
+nn <- dd %>% filter(centers=="01") %>% arrange(-availability)
+nn  %>% head(20)
+```
+```{r}
+dd %>% filter(centers=='01') %>% arrange(-availability) %>% ggplot(aes(x=seq_along(words),y=availability)) + geom_line() + facet_wrap(~centers)
+```
+
+## Un caso particular
 
 
 
@@ -219,7 +295,7 @@ Para calcular un punto característico, en el cual se encuentre un equilibrio en
 
 
 ```{r}
-d <- read.displex("../datos.txt")
+d <- read.displex("datos.txt")
 dd <- displex_availability(d,law=displex_exp_law,reduce=displex_additive_law)
 dd <- dd %>% filter(centers=="01") %>% arrange(-availability)
 dd
@@ -289,7 +365,7 @@ dd$words[dd$availability > sugeno.integral(dd$availability,h = function(x) {sqrt
 ```
 
 ```{r}
-d <- read.displex("../datos.txt")
+d <- read.displex("datos.txt")
 dd <- displex_availability(d,law=lopez_law,reduce=function (x) {sum(x) / N})
 dd <- dd %>% filter(centers=="01")
 dd$words[dd$availability >= sugeno.integral(dd$availability)]

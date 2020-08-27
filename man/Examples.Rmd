@@ -11,6 +11,15 @@ Hay varios trabajos y modelos que se han ido refinando progresivamente para resp
 Para ello, este documento se establece como un ejemplo de aplicación de la librería que se ha utilizado para este trabajo, así como de discusión y justificación de las propuestas anteriores y presentes.
 
 ```{r}
+install.packages("devtool")
+library(devtools)
+install.packages("tidyverse")
+install_github("jmss70/displex")
+```
+
+
+```{r}
+install.packages("devtools")
 library(tidyverse)
 library(displex)
 ```

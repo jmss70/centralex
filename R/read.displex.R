@@ -1,13 +1,13 @@
 #' Zipf law
-displex_zipf_law <- function(w, a=1,d=0) {
+displex_zipf_law <- function(w, k=1,a=1,d=0) {
   f = 1/(seq_along(w)+d)^a
   names(f) <- w
   f
 }
 
 #' Exponential law
-displex_exp_law <- function(w,a=2,d=0) {
-  f = 1/a^(seq_along(w)+d)
+displex_exp_law <- function(w,a=2,k=1,d=0) {
+  f = k/a^(seq_along(w)+d)
   names(f) <- w
   f
 }
@@ -42,10 +42,11 @@ read.displex <- function(file) {
     #w$class = "displex_wordlist"
     words[[length(words)+1]] = w
   }
-  data.frame(infos=infos, users=users, centers=centers, words=I(words))
+  d <- data.frame(infos=infos, users=users, centers=centers, words=I(words))
+  d
 }
 
-displex_availability <- function(data,law=displex_zipf_law, reduce=displex_additive_law) {
+displex_availability <- function(data,law=displex_exp_law, reduce=displex_additive_law) {
   words        = character()
   availability = numeric()
 
