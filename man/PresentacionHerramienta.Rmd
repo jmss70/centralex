@@ -106,33 +106,26 @@ d <- d %>% filter(centers=="01")
 
 ## Ejemplo 1. Modelo de aplicación simple: evaluación exponencial e integración mediante suma probabilística
 
+Por defecto, se utiliza una ley exponencial $1/2^i$:
 ```{r}
-dd <- displex_availability(d)
-dd %>% arrange(-availability) %>% ggplot(aes(x=seq_along(words),y=availability)) + geom_line()
+data.frame(x=1:20) %>% mutate(y=displex_exp_law(x)) %>% ggplot(aes(x=x,y=y)) + geom_line()
+```
+y se integra las distintas valoraciones mediante una ley de suma probabilística:
+
+```{r}
+expYprob <- displex_availability(d)
+expYprob %>% arrange(-availability) %>% ggplot(aes(x=seq_along(words),y=availability)) + geom_line()
+```
+Si seleccionamos los elementos más representativos y los que menos:
+
+```{r}
+expYprob %>% arrange(-availability) %>% head(10) %>% select(words, availability)
 ```
 
-Es posible observar que, puesto que el proceso de la suma probabilística es siempre no decreciente, es decir, la adición de nuevos valores nunca disminuye el valor "acumulado", puede ocurrir que, al realizar la agregación, _demasiados_ valores se hagan indistinguibles de 1.
+## Ejemplo 2: Modelo de López-Strassburger
 
+El modelo propuesto por López-Strassburger se basa en el recuentode las distintas posiciones que alcanza cada término en las listas:
 ```{r}
-dd %>% filter(centers=="01") %>% arrange(-availability) %>% head(30)
-```
-```{r}
-dd <- displex_availability(d,law=function(x) {displex_exp_law(x,k=1/2)})
-dd %>% arrange(-availability) %>% ggplot(aes(x=seq_along(words),y=availability)) + geom_line() + facet_wrap(~centers)
-```
-
-## Ejemplo 1: Modelo de López-Strassburger
-
-Como ejemplo inicial, consideremos el caso del modelo de López-Strassburger.
-
-La fórmula principalmente propuesta hasta ahora ha sido la que enunciaron Lopez-Strasburger, basada en el recuendo del número de veces que aparece una palabra en una determinada posición, e integrando esa información mediante una ponderación según una exponencial, con un parámetro que, generalmente, se evalúa como -2.3.
-
-Este desarrollo se podría reconstruir como:
-
-
-```{r}
-d <- read.displex("datos.txt")
-d <- d %>% filter(centers=="01")
 # Recopilamos todas las palabras y sus posiciones en las listas
 words = c()
 pos   = c()
@@ -143,154 +136,183 @@ for (i in seq_along(d$words)) {
 
 # Organizamos las palabras y sus posiciones en una tabla
 x <- table(words,pos)
-x 
+x[c('cabeza','pierna','abdomen'),]
 ```
 
-Esta información se integra mediante una ponderación por factores exponenciales, dando lugar a
-
+Construyendo las constantes de la evaluación
 ```{r}
-getMaxLength <- function(d) {
-  max(vapply(d$words, function(x) {length(x)}, FUN.VALUE=1L))
-}
-
 # Máxima posición alcanzada
-n <- getMaxLength(d)
+n <- max(vapply(d$words, function(x) {length(x)}, FUN.VALUE=1L))
 # Número total de hablantes
 N <- length(unique(d$users))
-
-m <- exp(-2.3*(seq_along(1:n) - 1) / (n-1))
-dl <- apply(x,1,function(a) {sum(a * m / N)})
-dl <- data.frame(words=names(dl), availability =dl)  %>% arrange(-availability)
-dl %>% head(20)
 ```
 
-Es posible demostrar que este proceso es una aplicación particular del modelo general que proponemos, utilizando como evaluación de cada muestra una ley exponencial adaptada, que hemos denominado lopez_law, y como agregación una media ponderada:
+se obtiene que la posición máxima es $n=`r n`$ y el número de hablantes es $I_1=`r N`$.
 
+Esta información se integra mediante una ponderación por factores exponenciales, dando lugar a
+```{r}
+m <- exp(-2.3*(seq_along(1:n) - 1) / (n-1))
+lopezstrass <- apply(x,1,function(a) {sum(a * m / N)})
+lopezstrass <- data.frame(words=names(lopezstrass), availability =lopezstrass)
+lopezstrass %>% arrange(-availability) %>% select(words,availability)  %>% head(10) %>% select(words,availability)
+```
+```{r}
+lopezstrass %>% arrange(-availability) %>% ggplot(aes(x=seq_along(words),y=availability)) + geom_line()
+```
+
+
+Como se ha discutido anteriormente, el modelo de López-Strassburger se puede evaluar como un modelo exponencial: 
+$$e^{-2.3 \frac{i-1}{n-1}} = \frac 1{e^{2.3 \frac{i-1}{n-1}}}=\frac 1{\left(e^{\frac{2.3}{n-1}}\right)^{i-1}}$$
+por lo que se puede modelar mediante una ley exponencial de base $a=e^{\frac{2.3}{n-1}}$ y desplazamiento $d=-1$, y utilizando como función de agregación la suma, dividida por el número de hablantes:
 ```{r}
 
 lopez_law <- function(w) {
-  exp(-2.3*(seq_along(w)-1)/(n-1))
+  displex_exp_law(w,a=exp(2.3/(n-1)),d=-1)
+}
+
+lopez_reduce <- function(x) {
+  sum(x) / N
 }
 
 # Se calcula la disponibilidad de cada término aplicando el modelo exponencial de López y reduciendo mediante un promedio por hablantes
-dd <- displex_availability(d,law=lopez_law,reduce=function (x) {sum(x) / N})
-dd %>% arrange(-availability) %>% head(40)
+lopezstrass_nm <- displex_availability(d,law=lopez_law,reduce=lopez_reduce)
+lopezstrass_nm %>% arrange(-availability) %>% head(10) %>% select(words,availability)
 ```
 
-
-
-
-## Ejemplo 1
-
-Valores por defecto (que no por ellos más relevantes) proporcionados por las librerías. Se aplica una ley de Zipf como ley de evaluación de cada prueba y la agregación aditiva como modelo de agregacióin de los datos.
+Es posible verificar que ambas formas de calcular son virtualmente idénticas, observando las diferencias entre ellas:
 
 ```{r}
-dd <- displex_availability(d)
-dd %>% arrange(-availability) %>% ggplot(aes(x=seq_along(words),y=availability)) + geom_line() + facet_wrap(~centers)
+inner_join(lopezstrass %>% select(words, availability), lopezstrass_nm %>% select(words, availability), by="words") %>% mutate(diff=availability.x - availability.y) %>% select(diff) %>% summarise(maxdiff=max(diff))
 ```
+La diferencia máxima anda por el orden de 3 unidades, después de 15 ceros decimales. Lo cual es justificable por los pequeños defectos de aproximación que se realizan durante el proceso.
+
+Por tanto, el procedimiento de López-Strassburger es un caso particular de aplicación de una ley exponencial, en este caso de base $a=e^{\frac{2.3}{n-1}} = `r exp(2.3/(n-1))`$, y desplazamiento inicial $d=-1$.
+
+Puesto que el objetivo de los estudios de disponibilidad léxica es, primariamente, ordenar el léxico según su accesibilidad, realizando una comparativa de los modelos exponencial y de López-Strassburger, se puede observar que tieden a clasificar en los primeros y últimos lugares los mismos términos y, en general, se observa una tendencia lineal entre las dos medidas. Es de esperar que haya diferencias, puesto que son dos modelos con cuantificaciones distintas. Pero parece evidente que hay una fuerte relación entre los dos, puesto que su función es medir el mismo concepto.
 
 ```{r}
-dd %>% filter(centers=="01") %>% arrange(-availability) %>% head(10)
-```
-Es posible observar que hay grupos de valores, bastante extensos, que tienen disponibilidad 1.
-
-## Ejemplo 2
-
-Una ley de compatibilidad de cada prueba de Zipft, pero se usa como agregación una media. Se puede observar cómo cambian los rangos de los datos.
-
-```{r}
-dd <- displex_availability(d,reduce=mean)
-dd %>% arrange(-availability) %>% ggplot(aes(x=seq_along(words),y=availability)) + geom_line() + facet_wrap(~centers)
+analysisComp <-
+inner_join(expYprob %>% arrange(-availability) %>% mutate(eOrd=seq_along(words)) %>% rename(eAvailability=availability),
+           lopezstrass %>% arrange(-availability) %>% mutate(lOrd=seq_along(words)) %>% rename(lAvailability=availability),
+           by="words") %>%
+  mutate(diffOrd=eOrd - lOrd)
+analysisComp %>% ggplot(aes(x=eOrd,y=lOrd)) + geom_point(aes(color=diffOrd))
 ```
 
 ```{r}
-dd %>% filter(centers=="01") %>% arrange(-availability) %>% head(20)
+analysisComp %>% ggplot(aes(x=eAvailability,y=lAvailability)) + geom_point(aes(color=diffOrd))
 ```
+Comparando los valores de disponibilidad obtenidos se puede observar que el modelo con la suma probabilística tiende a expandir más las valoraciones que el modelo de López-Strassburger. El modelo basado en la suma probabilística, para cada nueva aparición de un término, acumula, aunque sea poco, su disponibilidad. Sin embargo, en el modelo basado en promedio de López-Strassburger, la aparición de un término en una posición posterior puede decrementar el promedio, llegándose a la paradógica situación en la que la aparición en una de las listas puede decrementar el valor de la disponibilidad.
 
-## Ejemplo 3
+Esta "paradoja" fue la que hizo que nos planteáramos la necesidad de un nuevo modelo de evaluación de la disponibilidad. Además, creemos que es importante que el modelo que se proponga tenga el respaldo de un marco teórico que permita posteriores desarrollos. A continuación se proponen otras posibilidades de evaluación, basados en el mismo macro modelo de evaluación individual de cada prueba y agregación de los valores.
 
-Una ley de compatibilidad de cada prueba de Zipft, que empieza por 1/2 (por defecto empieza por el valor 1), usando como agregación una media. Se puede observar cómo cambian los rangos de los datos.
+
+
+## Ejemplo 3: Ley de Zipf-Mandelbrot
+
+Partiendo de la ley de Zipf-Mandelbrot, expuesta anteriormente, que tiene la forma
+```{r}
+data.frame(x=1:20) %>% mutate(y=displex_zipf_law(x)) %>% ggplot(aes(x=x,y=y)) + geom_line()
+```
+y aplicando una ley de suma probabilística, se llega a una distribución como:
 
 ```{r}
-dd <- displex_availability(d,law=function(x) {displex_zipf_law(x,d=0)},reduce=mean)
-dd %>% arrange(-availability) %>% ggplot(aes(x=seq_along(words),y=availability)) + geom_line() + facet_wrap(~centers)
+zipfYexp <- displex_availability(d,law=displex_zipf_law)
+zipfYexp %>% arrange(-availability) %>% ggplot(aes(x=seq_along(words),y=availability)) + geom_line()
+```
+Es posible observar que hay muchas valoraciones que son indistinguibles de uno. 
+```{r}
+zipfYexp %>% filter(centers=="01") %>% arrange(-availability) %>% head(10) %>% select(words, availability)
+```
+
+Esto se debe a que la ley de Zipf-Mandelbrot que hemos aplicado asigna, al primer término enunciado, el valor uno, y la ley probabilística nunca disminuye el valor. Esto lleva a que, una vez un término ha sido evaluado en una realización con el valor unidad, nunca decrementará.
+
+Esta situación lleva a plantearse qué entendemos por una "buena representación" de un centro de interés. Un concepto que todos tenemos, más o menos, asimilado, pero que no está formalizado.
+
+
+Analizando la comparativa con la de Lopez-Strassburger, se puede observar que la relación es mucho menos fuerte que en el caso estudiado anteriormente.
+```{r}
+analysisComp <-
+inner_join(zipfYexp %>% arrange(-availability) %>% mutate(eOrd=seq_along(words)) %>% rename(eAvailability=availability),
+           lopezstrass %>% arrange(-availability) %>% mutate(lOrd=seq_along(words)) %>% rename(lAvailability=availability),
+           by="words") %>%
+  mutate(diffOrd=eOrd - lOrd)
+analysisComp %>% ggplot(aes(x=eOrd,y=lOrd)) + geom_point(aes(color=diffOrd))
+```
+
+
+Sin embargo, si en lugar de la suma probabilística se considera como agregación la media de los valores obtenidos para cada término, se obtiene la siguiente representación:
+```{r}
+zipfYmean <- displex_availability(d,law=displex_zipf_law,reduce=mean)
+zipfYmean %>% arrange(-availability) %>% ggplot(aes(x=seq_along(words),y=availability)) + geom_line()
+```
+
+De nuevo se observa una relación poco clara con la medida de López-Strassburger:
+```{r}
+analysisComp <-
+inner_join(zipfYmean %>% arrange(-availability) %>% mutate(eOrd=seq_along(words)) %>% rename(eAvailability=availability),
+           lopezstrass %>% arrange(-availability) %>% mutate(lOrd=seq_along(words)) %>% rename(lAvailability=availability),
+           by="words") %>%
+  mutate(diffOrd=eOrd - lOrd)
+analysisComp %>% ggplot(aes(x=eOrd,y=lOrd)) + geom_point(aes(color=diffOrd))
+```
+
+O se podría haber corregido la evaluación inicial, para evitar esa primera evaluación unidad:
+```{r}
+data.frame(x=1:20) %>% mutate(y=displex_zipf_law(x, d=1)) %>% ggplot(aes(x=x,y=y)) + geom_line()
+```
+Obteniéndose una forma más conocida
+
+```{r}
+avSanc <- displex_availability(d,law=function(x) {displex_zipf_law(x,d=1)},reduce=displex_additive_law)
+avSanc %>% arrange(-availability) %>% ggplot(aes(x=seq_along(words),y=availability)) + geom_line()
+```
+
+Analizando la relación entre la evaluación de López-Strassburger y esta posibilidad, se observa una clara dependencia no lineal. 
+```{r}
+analysisComp <-
+inner_join(avSanc %>% arrange(-availability) %>% mutate(eOrd=seq_along(words)) %>% rename(eAvailability=availability),
+           lopezstrass %>% arrange(-availability) %>% mutate(lOrd=seq_along(words)) %>% rename(lAvailability=availability),
+           by="words") %>%
+  mutate(diffOrd=eOrd - lOrd)
+analysisComp %>% ggplot(aes(x=eAvailability,y=lAvailability)) + geom_point(aes(color=diffOrd))
 ```
 
 ```{r}
-dd %>% filter(centers=="01") %>% arrange(-availability) %>% head(20)
+analysisComp %>% ggplot(aes(x=eOrd,y=lOrd)) + geom_point(aes(color=diffOrd))
 ```
-
-## Ejemplo 4
-
-## Ejemplo 5
-
-Una ley de agregación exponencial, con ley de agregación la adición probabilística
-
-```{r}
-dd <- displex_availability(d,law=displex_exp_law,reduce=displex_additive_law)
-dd %>% arrange(-availability) %>% ggplot(aes(x=seq_along(words),y=availability)) + geom_line() + facet_wrap(~centers)
-```
-
-```{r}
-nn <- dd %>% filter(centers=="01") %>% arrange(-availability)
-nn  %>% head(20)
-```
-```{r}
-dd %>% filter(centers=='01') %>% arrange(-availability) %>% ggplot(aes(x=seq_along(words),y=availability)) + geom_line() + facet_wrap(~centers)
-```
-
-## Un caso particular
+Este último ejemplo es el que se propuso en nuestro anterior trabajo, en el que se puede observar una fuerte relación entre los dos modelos de evaluación, respondiendo a la misma pregunta. Sin embargo, el modelo que proponemos, al estar enmarcado dentro de un marco teórico bien establecido, la teoría de los conjuntos difusos, permite utilizar una serie de recursos teóricos que permiten llevar a cabo otros desarrollos en el estudio de la disponibilidad léxica.
 
 
-
-
-```{r}
-dd %>% arrange(-availability) %>% ggplot(aes(x=seq_along(words),y=availability)) + geom_line() 
-```
-
-```{r}
-nn$order <- seq_along(nn$words)
-dl$order <- seq_along(dl$words)
-ddd <- inner_join(nn,dl,by="words") %>% mutate(diff = order.x-order.y) %>% rename(availability.el = availability.x, order.el=order.x, availability.lo = availability.y, order.lo = order.y)
-ddd
-```
-
-```{r}
-barplot(table(ddd$diff))
-```
-
-```{r}
-ddd$absdiff <- abs(ddd$diff)
-ddd %>% ungroup() %>% arrange(-absdiff) %>% select(words, diff, order.el, order.lo)
-```
-
-```{r}
-ddd %>% ggplot(aes(x=order.el,order.lo)) + geom_point(aes(color=absdiff))
-```
-
-
-El color muestra la diferencia en el orden de clasificación de los palabros por el método que hemos propoesto nosotros (conjuntos difuso basados en una ley exponencial y aglutinación mediante ley probabilística -- order.y) y el método propuesto por López (el formulaco de las narices --- order.y). El color significa la diferencia entre las dos posiciones. Se puede ver cómo en los que están en primeras posiciones y en últimos predomina el color oscuro, que significa poca o ninguna diferencia de posición. Las diferencias, como cabe esperar, se encuentra en los puntos interemedios. 
-
-Es posible observar que hay una relación bastante lineal entre ambos modelos de evaluación. Y, además, en los valores extremos (mucha disponibilidad o poca disponibilidad) los evalúan de forma similar. Por tanto, representan, básicamente, la misma información.
-
-
-Representando, en lugar del orden los valores de disponibilidad obtenidos, se observa, de nuevo un fenómeno similar. Los valores muy disponibles se identifican con los dos modelos.
-
-```{r}
-ddd %>% ggplot(aes(x=availability.el,availability.lo)) + geom_point(aes(color=absdiff))
-```
-
-
-# Integral de Sugeno
+# Cálculo de la compatibilidad característica: Integral de Sugeno
 
 El concepto de media o promedio en Estadística se modeliza a través del concepto de integral que, como su propio nombre indica, integra los valores de al variable ponderando por su importancia relativa, que se cuantifica como una distribución de frecuencia o probabilidad. Representa así un punto de equilibrio entre los distintos valores.
 
-En el ámbito de las medidas difusas existe un concepto parecido, que corresponde con la integral de Sugeno de una función sobre un conjunto difuso respecto a una medida sobre el conjunto permite un punto de equilibrio entre los valores proporcionados a los valores del conjunto, mediante una función que los clasifica en grado de compatibiliad, en nuestro caso la disponibilidad obtenida, frente a una medida difusa sobre los conjuntos a que toman valr  ***IBI***
+En el ámbito de las medidas difusas existe un concepto similar, que corresponde con la integral de Sugeno de una función respecto a una medida de conjuntos difusos y permite un punto de equilibrio entre los valores proporcionados a los elementos del conjunto y la medida del conjunto con los mayores valores, denominados $\alpha$-cortes.
+$$\int_A h(x) \circ g = \sup_{E\subseteq X}[\min(\min_{x\in E} h(x), g(A\cap E))] = \sup_{\alpha\in[0,1]} \min(\alpha,g(A\cap F_\alpha))$$
+donde $F_\alpha=\{x | h(x) \ge \alpha\}$.
 
-Para calcular un punto característico, en el cual se encuentre un equilibrio entre el tamaño de la población seleccionada y su relevancia, se puede tomar en consideración el Fuzzy Expected Value. En este caso, puesto que se quiere encontrar un punto de equilibrio entre el tamaño de la muestra y los valores 
+Tomando como $h(x)$ la disponibilidad obtenida en el estudio anterior y como $g(A)$ el tamaño relativo del conjunto (es decir, la proporción del total del conjunto $A$ sobre todo el conjunto de términos), se obtendría un punto de equilibrio entre la compatibilidad con el centro de interés y el tamaño del conjunto.
 
 
-## Calculo de los grupos de elementos característicos
+Tomando la integral sobre todo el conjunto de términos, se construiría el FEV (Valor Difuso Esperado). Para ejemplificar este cálculo, considérese los distintos niveles de compatibilidad encontrados durante el cálculo de la disponibilidad (línea negra en el siguiente gráfico). Si calculamos para cada uno de esos valores la proporción de elementos que tienen al menos esa compatibilidad, a medida que disminuye la cota más valores alcanzan esa compatibilidad y mayor es el tamaño del conjunto (línea gris). El Valor Difuso Esperado es el valor en el que se cruzan las dos líneas.
+
+```{r}
+# Tomamos los valores de disponibilidad
+dt <- avSanc$availability
+g <- function(x) {length(x) / length(dt)}
+
+# Determine alpha cuts and its measure
+levels <- sort(unique(dt), decreasing=TRUE)
+gs <- sapply(levels, function(x) {g(dt[dt >= x])})
+
+data.frame(levels  = levels, measures = gs) %>% 
+  ggplot(aes(x=seq_along(levels), y=levels))  + 
+  geom_line(colour="black") + 
+  geom_line(aes(x=seq_along(levels), y=gs),colour="dark gray") + xlab("") + ylab("nivel de corte (valor de alfa)") + 
+  geom_text(aes(x=length(levels), y=1), label="Tamaño del alfa-corte",hjust=1,vjust=0) +
+  geom_text(aes(x=length(levels), y=0), label="Valor de alfa",hjust=1,vjust=1)
+```
 
 
 

@@ -55,12 +55,14 @@ displex_availability <- function(data,law=displex_exp_law, reduce=displex_additi
     availability =c(availability, law(data$words[i][[1]]))
   }
   centers     = rep(data$centers, vapply(data$words, FUN = function(x) length(x), FUN.VALUE = 0L))
-  d <- data.frame(centers=centers, words=words, availability=availability)
-  d %>% group_by(centers,words) %>% summarise(availability=reduce(availability)) %>% ungroup()
+  data.frame(centers=centers, words=words, availability=availability) %>%
+    group_by(centers,words) %>%
+    summarise(availability=reduce(availability)) %>%
+    ungroup()
 }
 
 
-sugeno.integral <- function(d, g=function(x) {length(x)/length(d)}, h=function(x) {x}) {
+fuzzy.expected.value <- function(d, g=function(x) {length(x)/length(d)}, h=function(x) {x}) {
   # Calculate by function, and the levels for alpha
   vals <- h(d)
   levels <- sort(unique(vals), decreasing=TRUE)
