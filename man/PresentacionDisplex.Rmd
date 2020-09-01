@@ -24,6 +24,8 @@ Las siguientes órdenes instalan el paquete Displex del repositorio GitHub. Todo
 Se recomienda el uso del universo TidyVerse para el análisis de datos, ya que proporciona herramientas con una sintaxis muy potente que facilita enormemente la tarea de análisis y representación de datos.
 
      install.packages("tidyverse")
+     install.packages("kableExtra")
+
 
 
 Llevados a cabo los pasos anteriores, y si no se ha producido ningún contratiempo, el sistema está preparado para llevar a cabo el trabajo.
@@ -33,6 +35,7 @@ Llevados a cabo los pasos anteriores, y si no se ha producido ningún contratiem
 Para poder usar las librerías hay que cargarlas en nuestra sesión de trabajo, poniendo a nuestra disposición las funciones que proporcionan:
 ```{r}
 library(tidyverse)
+library(kableExtra)
 library(displex)
 ```
 
@@ -52,6 +55,156 @@ Un ejemplo de dos líneas sería:
 Suponiendo que tenemos todos los datos cargados en un archivo, denominado `datos.txt`, que estará alojado en el mismo directorio que el script de procesamiento, se podrían cargar los datos como:
 
 ```{r}
-d <- read.displex("datos.txt")
-head(d)
+data <- read.displex("datos.txt")
+data %>% 
+  head() %>% 
+  kbl()  %>% 
+  kable_styling(full_width = F)
 ```
+
+
+
+
+# Cálculo de la disponibilidad
+
+La función general del cálculo de la disponibilidad es `displex_availability`. Sin embargo, el uso de esta función requiere del uso de varios parámetros. Se han construidos dos funciones de utilidad que encapsulan su uso y ofrecen los dos modelos que consideramos, por el momento, más interesantes. Consideramos que es preferible exponer su uso mediante ejemplos.
+
+## Modelo de López-Strassburger
+
+
+Este modelo, que es el conocido y el último de una serie de iteraciones para la cuantificación de la disponibilidad, se puede usar como:
+```{r}
+disponibilidad <- build.lopezstrass.availability(data)
+```
+Se construye entonces un nuevo marco de datos cuyos campos son el centro de interés, la palabra y la disponibilidad calculada, junto con otros datos respecto a los que se ha expresado interés, como la posición y las frecuencias relativas y acumuladas dentro del centro de interés:
+```{r}
+head(disponibilidad) %>%
+  kbl() %>%
+  kable_styling(full_width = F)
+```
+Al ser un marco de datos de R estándard, se pueden realizar sobre el todas las operaciones que permite el sistema, como seleccionar los términos del centro de interés "03", ordenarlos en orden decreciente de disponibilidad y ver los 10 más disponibles
+```{r}
+disponibilidad %>% 
+  filter(centers=="03") %>% 
+  arrange(-availability) %>% 
+  head(10) %>%
+  kbl() %>% kable_styling(full_width = F)
+```
+O representar la curva de disponibilidad, esto es, la sucesión de valores de disponibilidad, una vez ordenados en valor decreciente de disponibilidad:
+```{r}
+disponibilidad %>% 
+  filter(centers=="03") %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order, y=availability)) + geom_line() +
+  xlab("Sucesión de palabras") + ylab("Disponibilidad")
+```
+
+## Modelo de Ávila-Sánchez
+
+Ávila y Sánchez proponen un macro-modelo para el estudio de la disponibilidad, a partir de la Teoría de los Conjuntos Difusos y mediante la modelización de los conceptos que se pretenden representar en estudios. Esta evaluación se produce en dos etapas. En la primera se cuantifica la relevancia de cada término en las pruebas obtenidas para cada hablante y centro de interés según una ley descendente según se avanza en cada listado, y en una segunda etapa se integra esa información con una ley aditiva que integra los distintos valores alcanzados para cada palabra en cada centro de interés.
+
+Hay múltiples posibles elecciones, pero en distintas pruebas pareció más prometedoras las que utilizaban en la primera etapa una ley de Zipf-Mandelbrot y en la segunda una adición probabilística. La interpretación de los valores obtenidos corresponden a la "centralidad" de cada término en el centro de interés. Un valor de uno o muy cercano respondería a la pertenencia al núcleo del vocabulario específico del centro de interés, mientras que una valor próximo a cero indicaría que sería un término poco accesible.
+
+Se ha implementado una función que lleva a cabo este análisis, `displex_avilasanchez_availability`, que se utiliza de la misma forma que el anterior:
+
+```{r}
+disponibilidad <- build.avilasanchez.availability(data)
+```
+
+
+
+Obteniéndose, de nuevo, un nuevo marco de datos con la disponibilidad de cada término en cada cnetro de interés
+```{r}
+disponibilidad %>% 
+  filter(centers=="03") %>% 
+  arrange(-availability) %>% 
+  head(10) %>% 
+  kable() %>%
+  kable_styling(full_width = F)
+```
+Que se puede procesar como cualquier marco de datos del sistema R:
+```{r}
+disponibilidad %>% 
+  filter(centers=="03") %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order, y=availability)) + geom_line() +
+  xlab("Sucesión de palabras") + ylab("Disponibilidad")
+```
+
+Debido a las características de los operadores aditivos de la teoría de los conjuntos difusos, es posible que la forma de la curva no sea la esperada, no habíendo términos con valoraciones cercanas a uno (por ejemplo, si se tienen pocos datos y relativamente dispersos) o demasiados términos con valoraciones cercanas a uno (por ejemplo, si se tienen muchas muestras). Considerando esta situación, se puede regular la curva mediante un parámetro adicional, $k$, que va a "subir" o "bajar" la curva, pero manteniendo su forma y clasificación. El valor por defecto de $k$ es uno. Si se da un valor entre $0$ y $1$, la curva "bajará" (menos términos con valores cercanos a uno), mientras que si a $k$ se le da un valor mayor que la unidad la curva "subirá" (más términos cercanos a la unidad).
+
+```{r}
+disponibilidad <- build.avilasanchez.availability(data, k = 0.1)
+disponibilidad %>%
+  filter(centers=="03") %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order, y=availability)) + geom_line() +
+  xlab("Sucesión de palabras") + ylab("Disponibilidad")
+```
+
+Obteniéndose, de nuevo, un nuevo marco de datos con la disponibilidad de cada término en cada cnetro de interés
+```{r}
+disponibilidad <- build.avilasanchez.availability(data, k = 2)
+disponibilidad %>%
+  filter(centers=="03") %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=seq_along(availability), y=availability)) + geom_line() +
+  xlab("Sucesión de palabras") + ylab("Disponibilidad")
+```
+Téngase en cuenta que estos dos ejemplos son a modo de exposición y para valores muy extremos. En nuestras pruebas hemos encontrado que el valor de referencia es lo suficientemente bueno en todos los casos que hemos encontrado.
+
+# Niveles de disponibilidad
+
+Una pregunta recurrente es considerar cual es el tamaño del conjunto de elementos que se consideran que forman parte del núcleo de un centro de interés. Para responder a  esta cuestión, y a partir del marco teórico que se ha utilizado en nuestra propuesta, se proporciona una herramienta que etiqueta los términos en niveles de centralidad. El nivel 0 corresponderían a aquellos elementos que no pertenecen al núcleo, es decir, aquellos términos que no son generalmente accesibles. Los níveles 1, 2, 3, ... y sucesivos representarían un mayor grado de centralidad en el centro de interés.
+
+```{r}
+disponibilidad <- build.avilasanchez.availability(data)
+```
+
+```{r}
+levels <- classify.availability.levels(disponibilidad)
+levels %>% head(20) %>%
+  kbl() %>%
+  kable_styling(full_width = F)
+```
+
+```{r}
+levels %>% 
+  filter(centers=="01") %>% arrange(-availability)
+```
+
+Se puede construir con esta información una representación en la que se observan la distribución de las disponibilidades en el centro de interés y los diferentes conjuntos de cortes.
+
+```{r}
+levels %>%
+  filter(centers=="04") %>% 
+  mutate(level=factor(level)) %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order,y=availability,color=level)) + geom_line() +
+  xlab("Posición del término en el centro de interés") +
+  ylab("Disponibilidad")
+```
+
+
+```{r}
+clasificacion <- build.availability.levels(levels)
+```
+```{r}
+clasificacion %>% filter(levels> 0)  %>%
+  kable(longtable=TRUE,booktabs=TRUE) %>% 
+  kable_styling(latex_options = c("hold_position", "repeat_header")) %>%
+  column_spec(4, width = "35em") 
+```
+
+
+```{r}
+levels %>%
+  mutate(level=factor(level)) %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order,y=availability,color=level)) + geom_line() + facet_wrap(~centers)  +
+  xlab("Secuencia de palabras (por grado descendente de compatibilidad)") + 
+  ylab("Disponibilidad")
+```
+
+
+

@@ -110,13 +110,13 @@ d <- d %>% filter(centers=="01")
 Por defecto, se utiliza una ley exponencial $1/2^i$:
 ```{r}
 data.frame(x=1:20) %>% 
-  mutate(y=displex_exp_law(x)) %>% 
+  mutate(y=exponential.law(x)) %>% 
   ggplot(aes(x=x,y=y)) + geom_line()
 ```
 y se integra las distintas valoraciones mediante una ley de suma probabilística:
 
 ```{r}
-expYprob <- displex_availability(d)
+expYprob <- build.availability(d)
 expYprob %>% 
   arrange(-availability) %>% 
   ggplot(aes(x=seq_along(words),y=availability)) + geom_line() + 
@@ -185,16 +185,16 @@ $$e^{-2.3 \frac{i-1}{n-1}} = \frac 1{e^{2.3 \frac{i-1}{n-1}}}=\frac 1{\left(e^{\
 por lo que se puede modelar mediante una ley exponencial de base $a=e^{\frac{2.3}{n-1}}$ y desplazamiento $d=-1$, y utilizando como función de agregación la suma, dividida por el número de hablantes:
 ```{r}
 
-lopez_law <- function(w) {
-  displex_exp_law(w,a=exp(2.3/(n-1)),d=-1)
+lopez.law <- function(w) {
+  exponential.law(w,a=exp(2.3/(n-1)),d=-1)
 }
 
-lopez_reduce <- function(x) {
+lopez.reduce <- function(x) {
   sum(x) / N
 }
 
 # Se calcula la disponibilidad de cada término aplicando el modelo exponencial de López y reduciendo mediante un promedio por hablantes
-lopezstrass_nm <- displex_availability(d,law=lopez_law,reduce=lopez_reduce)
+lopezstrass_nm <- build.availability(d,law=lopez.law,reduce=lopez.reduce)
 lopezstrass_nm %>% arrange(-availability) %>% head(10) %>% select(words,availability)
 ```
 
@@ -247,13 +247,13 @@ Esta "paradoja" fue la que hizo que nos planteáramos la necesidad de un nuevo m
 Partiendo de la ley de Zipf-Mandelbrot, expuesta anteriormente, que tiene la forma
 ```{r}
 data.frame(x=1:20) %>% 
-  mutate(y=displex_zipf_law(x)) %>% 
+  mutate(y=zipf.law(x)) %>% 
   ggplot(aes(x=x,y=y)) + geom_line()
 ```
 y aplicando una ley de suma probabilística, se llega a una distribución como:
 
 ```{r}
-zipfYexp <- displex_availability(d,law=displex_zipf_law)
+zipfYexp <- build.availability(d,law=zipf.law)
 
 zipfYexp %>% 
   arrange(-availability) %>% 
@@ -292,7 +292,7 @@ analysisComp %>% ggplot(aes(x=eOrd,y=lOrd)) + geom_point(aes(color=diffOrd)) +
 
 Sin embargo, si en lugar de la suma probabilística se considera como agregación la media de los valores obtenidos para cada término, se obtiene la siguiente representación:
 ```{r}
-zipfYmean <- displex_availability(d,law=displex_zipf_law,reduce=mean)
+zipfYmean <- build.availability(d,law=zipf.law,reduce=mean)
 
 zipfYmean %>% 
   arrange(-availability) %>% 
@@ -320,15 +320,15 @@ analysisComp %>% ggplot(aes(x=eOrd,y=lOrd)) + geom_point(aes(color=diffOrd)) +
 O se podría haber corregido la evaluación inicial, para evitar esa primera evaluación unidad:
 ```{r}
 data.frame(x=1:20) %>% 
-  mutate(y=displex_zipf_law(x, d=1)) %>% 
+  mutate(y=zipf.law(x, d=1)) %>% 
   ggplot(aes(x=x,y=y)) + geom_line()
 ```
 Obteniéndose una forma más conocida
 
 ```{r}
-avSanc <- displex_availability(d,
-                               law=function(x) {displex_zipf_law(x,d=1)},
-                               reduce=displex_additive_law)
+avSanc <- build.availability(d,
+                             law=function(x) {zipf.law(x,d=1)},
+                             reduce=additive.reduce.law)
 avSanc %>% 
   arrange(-availability) %>% 
   ggplot(aes(x=seq_along(words),y=availability)) + geom_line() + 
@@ -368,9 +368,9 @@ Este último ejemplo es el que se propuso en nuestro anterior trabajo, en el que
 Llevando a cabo este procedimiento para cada centro de interés:
 ```{r}
 d <- read.displex("datos.txt")
-dd <- displex_availability(d,
-                           law=function(x) {displex_zipf_law(x,d=1)},
-                           reduce=displex_additive_law)
+dd <- build.availability(d,
+                         law=function(x) {zipf.law(x,d=1)},
+                         reduce=additive.reduce.law)
 dd %>% arrange(-availability) %>% ggplot(aes(x=seq_along(words),y=availability)) + geom_line() + 
   facet_wrap(~centers) + 
   xlab("Secuencia de palabras (por grado descendente de compatibilidad)") + 
