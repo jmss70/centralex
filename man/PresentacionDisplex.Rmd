@@ -1,13 +1,21 @@
 ---
 title: "Presentación Displex"
 output:
-  pdf_document: default
+  html_document:
+    df_print: paged
   html_notebook: default
+  pdf_document: default
+  word_document: default
+always_allow_html: yes
 ---
 
 En este documento se presenta una librería de herramientas en R para el cálculo de la disponibilidad léxica, para la que se pretende que sea una guía rápida de uso básico. Aunque la librería permite, a través de programación funcional, implementar múltiples modelos, se proporcionan un conjunto de herramientas básicas prediseñadas para que se pueda empezar a usar de forma casi inmediata. Sin embargo, consideramos necesario hacer notar que estas funciones de aplicación directa representan a un subconjunto de las posibilidades que permite el sistema y que se han utilizado como herramienta rápida más que como solución definitiva.
 
 Hay otro trabajo en preparación en el que se discuten en profundidad los modelos y diferentes opciones, así como un estudio en profundidad de diferentes aspectos del cálculo de la disponibilidad y su interpretación. Sin embargo, el desarrollo de estas herramientas posteriores requeriría cierta soltura en el manejo de la sintaxis de R, así como con los conceptos de programación funcional.
+
+# Exposición y contextualización del sistema
+
+
 
 
 # Instalación
@@ -163,14 +171,24 @@ disponibilidad <- build.avilasanchez.availability(data)
 
 ```{r}
 levels <- classify.availability.levels(disponibilidad)
-levels %>% head(20) %>%
+levels %>% 
+  head(20) %>%
+  arrange(-availability) %>%
+  select(-order) %>%
   kbl() %>%
   kable_styling(full_width = F)
 ```
 
 ```{r}
 levels %>% 
-  filter(centers=="01") %>% arrange(-availability)
+  filter(centers=="01") %>% 
+  arrange(-availability)   %>% 
+  #head(20) %>%
+  filter(level > 0) %>%
+  select(-order) %>% 
+  kable(longtable=TRUE,booktabs=TRUE) %>% 
+  kable_styling(latex_options = c("hold_position", "repeat_header")) # %>%
+  #column_spec(2, width = "10em") 
 ```
 
 Se puede construir con esta información una representación en la que se observan la distribución de las disponibilidades en el centro de interés y los diferentes conjuntos de cortes.
