@@ -1,59 +1,81 @@
 ---
 title: "Presentación Displex"
 output:
+  pdf_document: default
+  html_notebook: default
   html_document:
     df_print: paged
-  html_notebook: default
-  pdf_document: default
   word_document: default
 always_allow_html: yes
 ---
 
-En este documento se presenta una librería de herramientas en R para el cálculo de la disponibilidad léxica, para la que se pretende que sea una guía rápida de uso básico. Aunque la librería permite, a través de programación funcional, implementar múltiples modelos, se proporcionan un conjunto de herramientas básicas prediseñadas para que se pueda empezar a usar de forma casi inmediata. Sin embargo, consideramos necesario hacer notar que estas funciones de aplicación directa representan a un subconjunto de las posibilidades que permite el sistema y que se han utilizado como herramienta rápida más que como solución definitiva.
+En este documento se presenta una librería de herramientas en lo que pretende que ser una guía rápida de uso básico para el cálculo de la disponibilidad léxica, la centralidad léxica y las diferentes funciones que de esta última se derivan. Aunque la librería permite, a través de programación funcional, implementar múltiples modelos, se proporciona un conjunto de herramientas básicas prediseñadas para que se pueda empezar a usar con las funcionalidades señaladas (disponibilidad, centralidad) de forma casi inmediata. Sin embargo, consideramos necesario hacer notar que estas funciones de aplicación directa representan tan solo un subconjunto de las posibilidades que permite el sistema aquí presentado.
 
-Hay otro trabajo en preparación en el que se discuten en profundidad los modelos y diferentes opciones, así como un estudio en profundidad de diferentes aspectos del cálculo de la disponibilidad y su interpretación. Sin embargo, el desarrollo de estas herramientas posteriores requeriría cierta soltura en el manejo de la sintaxis de R, así como con los conceptos de programación funcional.
+Actualmente está en preparación otro trabajo en el que se discuten en profundidad los modelos posibles y diferentes opciones de aplicación, así como un estudio en profundidad de diferentes aspectos de las bases teóricas del  cálculo  de la disponibilidad y su interpretación. Sin embargo, el desarrollo de estas herramientas posteriores requiere cierta destreza en el manejo de la sintaxis de R, así como con los conceptos de programación funcional, con lo que su presentación requiere otro ámbito de exposición.
 
 # Exposición y contextualización del sistema
 
+El sistema se ha implementado en R^[https://www.r-project.org/], una implentación abierta del lenguaje de programación S, que lleva en desarrollo desde 1992 y con una primera versión estable en el año 2000. Es fácilmente extensible y permite la reutilización de código y datos, soportado por una amplia comunidad a lo largo del mundo y se usa de forma habitual en entornos de análisis de datos de ingeniería y medicina. 
 
+RStudio^[https://rstudio.com/] es un entorno comercial de desarrollo para R que permite el uso personal gratuito y que aumenta la productividad en el uso de este lenguaje. Este sistema está disponible para la gran mayoría de plataformas y sistems operativos. Para facilitar el trabajo, se proporcionan utilidades que se pueden ejecutar dentro de este entorno y que facilitan el proceso de análisis.
+
+Es posible utilizar las funcionalidades proporcionadas por nuestro software sin el uso de RStudio, pero consideramos que su uso se hace excesivamente complejo y se pierden muchas de las posibilidades que proporciona este marco de software.
+
+Dentro del sistema construido en RStudio nos resulta especialmente interesante la posibilidad de usar el paradigma de la _programación literaria_, según la cual, en el mismo documento, se van integrando los contenidos textuales como la exposición de hechos o la interpretación de los análisis, con bloques de código que llevan a cabo las manipulaciones y representaciones de datos. Este documento ejemplifica esta metodología. Como ejemplo de sus ventajas, al incluir en el mismo documento el análisis que se ha llevado a cabo con el código para realizarlo, se potencia la replicabilidad, característica cada vez más exigida en el mundo académico, en la que se debe permitir que otros investigadores puedan replicar, tanto para verificar como para desarrollar, el trabajo expuesto. Este objetivo se cumple al exponer en el mismo documento la disertación y el código con el que se ha realizado los análisis.
+
+A diferencia de soluciones basados en programas autónomos, la implementación de esta solución dentro de un sistema como el formado por R junto con RStudio permite, además, la integración de todo el sistema de gestión de datos. Esto es, los resultados obtenidos a partir de las herramientas proporcionadas se incorporan al sistema, con lo que permite la integración en nuevos procesos de datos y la aplicación personal de los resultados obtenidos. En este documento se pueden encontrar algunos de estos desarrollos que pueden servir de ejemplo.
+
+La distribución de las soluciones es otro problema que ya ha encontrado soluciones eficientes dentro de la comunidad. Repositorios de código como GitHub permite la gestión y control automatizada de versiones. Es posible llevar a cabo un control exhaustivo de las modificaciones que se van realizando, sin necesidad de estar bajando e instalando continuamente programas. Con dos líneas de código aseguras que has instalado la última versión disponible. Además, este modelo de intercambio de código permite que los proyectos no desaparezcan, ya que se pueden crear ramas de cualquier repositorio de código para continuar su desarrollo, independientemente de los creadores originales.
+
+Entre las múltiples herramientas construidas sobre R encontramos muy interesantes y productivas las herramientas que conforman el "Universo Tidyverse"^[https://www.tidyverse.org/]. Son un conjunto de librerías que facilitan y permiten una manipulación expresiva de los datos, basada en el concepto de tubería. Este tratamiento se construye mediante la secuenciación de manipulaciones, que se van encadenando, siendo el resultado de un paso la fuente de datos para la siguiente. Esta característica, junto con operadores adaptados a este tipo de trabajo proporciona una forma potente y cómoda de llevar a cabo transformaciones que, de otra forma serían muy complejas. Las manipulaciones de datos presentadas en este trabajo se realizan utilizando estas herramientas.
 
 
 # Instalación
 
-Se ha optado por el uso del repositorio GitHub.com. Esto implica que el usuario debe llevar a cabo un pequeño paso de instalación que, en nuestra opinión, no es más complejo que cualquier proceso de instalación en el sistema R. Este paso ha de hacerse únicamente cuando se pretenda instalar o actualizar el paquete en el sistema. Puesto que nuestra intención es seguir trabajando en el paquete, sería recomendable realizar esta acción de forma periódica.
+Para el uso de esta herramienta es obligatorio la instalación del sistema R y se recomienda la instalación de RStudio, que permitirá la utilización de las facilidades de entorno de usuario. Se pueden encontrar en sus respectivas páginas, en las secciones de descarga, instaladores para múltiples sistemas operativos.
+
+Una vez instalada la aplicación RStudio, para poder utilizar las herramientas que proponemos,  el usuario debe llevar a cabo un  paso previo de instalación que, en nuestra opinión, no es más complejo que cualquier proceso de instalación en el sistema R. Este paso ha de hacerse únicamente cuando se pretenda instalar o actualizar el paquete en el sistema. Puesto que nuestra intención es seguir trabajando en el paquete, sería recomendable realizar esta acción de forma periódica o, al menos, a medida que se vayan actualizando funcionalidades a las ahora presentadas.
 
 Las siguientes órdenes instalan el paquete Displex del repositorio GitHub. Todo el código está implementado en R, con lo que es fácil de revisar.
+```{r eval=FALSE}
+install.packages("devtools")
+library(devtools)
+install_github("jmss70/displex")
+```
 
-    install.packages("devtools")
-    library(devtools)
-    install_github("jmss70/displex")
+Para instalar las herramientas del universo Tidyverse se utiliza la orden:
+```{r eval=FALSE}
+install.packages("tidyverse")
+```
 
 
-Se recomienda el uso del universo TidyVerse para el análisis de datos, ya que proporciona herramientas con una sintaxis muy potente que facilita enormemente la tarea de análisis y representación de datos.
+En este documento, además, y con el objetivo de mejorar la presentación de las tablas, se va a utilizar el paquete `kable`, que instalaremos con:
+```{r eval=FALSE}
+install.packages("kableExtra")
+```
 
-     install.packages("tidyverse")
-     install.packages("kableExtra")
 
 
-
-Llevados a cabo los pasos anteriores, y si no se ha producido ningún contratiempo, el sistema está preparado para llevar a cabo el trabajo.
+Una vez que se han llevado a cabo los pasos anteriores, y si no se ha producido ningún contratiempo, el sistema está preparado para el cálculo de los índices de disponibilidad y centralidad.
 
 # Carga de las librerías y los datos
 
-Para poder usar las librerías hay que cargarlas en nuestra sesión de trabajo, poniendo a nuestra disposición las funciones que proporcionan:
-```{r}
-library(tidyverse)
-library(kableExtra)
+En los pasos anteriores se han instalado en nuestro sistema las librerías que proporcionan diversas funcionalidades. Pero, para poderlas usarlas hay que cargarlas en la sesión de trabajo. Esto se consigue mediante:
+```{r message = FALSE, warning = FALSE}
 library(displex)
+library(kableExtra)
+library(tidyverse)
 ```
 
-Para cargar los datos, se espera que estén en un determinado formato, utilizado por ser el que habitualmente se encuentra en este tipo de estudios, creemos que por razones históricas. Sin embargo, consideramos que son redundantes y que habría que estudiar, en un futuro cercano, establecer un estandard de codificación que sea más coherente con los modelos de datos normalizados.
+El formato requerido de los datos es el habitualmente usado por los programas más empleados hasta ahora para el cálculo de la disponibilidad léxica (Lexidisp, Dispolex, esencialmente). Sin embargo, consideramos que parte de la información que contiene es redundantes y sería conveniente estudiar, en un futuro cercano, la posibilidad de establecer un standard de codificación que sea más coherente con los modelos de datos normalizados.
 
-Se espera que los datos estén en un archivo de texto, con campos separados por espacios:
-- Un campo de información del hablante
-- Un campo de identificación de usuario
-- Un campo de identificación de centro de interés
-- Una lista de palabras separadas por comas y en orden de realización
+
+De momento, se espera que los datos estén en un archivo de texto, con campos separados por espacios:
+- Un campo con información sociológica básica del hablante 
+- Un campo de identificación de usuario 
+- Un campo de identificación de centro de interés 
+- Una lista de palabras separadas por comas y siguiendo el orden de aparición en las listas originales.
+
 
 Un ejemplo de dos líneas sería:
 
@@ -75,7 +97,7 @@ data %>%
 
 # Cálculo de la disponibilidad
 
-La función general del cálculo de la disponibilidad es `displex_availability`. Sin embargo, el uso de esta función requiere del uso de varios parámetros. Se han construidos dos funciones de utilidad que encapsulan su uso y ofrecen los dos modelos que consideramos, por el momento, más interesantes. Consideramos que es preferible exponer su uso mediante ejemplos.
+La función general del cálculo de la disponibilidad es `displex_availability`. Sin embargo, el uso de esta función requiere del uso de varios parámetros. Se han construidos dos funciones de utilidad que encapsulan su uso y ofrecen los dos modelos que consideramos, por el momento, más interesantes (Modelo López-Strassburger y Modelo Ávila-Sánchez). Consideramos que es preferible exponer su uso mediante ejemplos.
 
 ## Modelo de López-Strassburger
 
@@ -84,13 +106,13 @@ Este modelo, que es el conocido y el último de una serie de iteraciones para la
 ```{r}
 disponibilidad <- build.lopezstrass.availability(data)
 ```
-Se construye entonces un nuevo marco de datos cuyos campos son el centro de interés, la palabra y la disponibilidad calculada, junto con otros datos respecto a los que se ha expresado interés, como la posición y las frecuencias relativas y acumuladas dentro del centro de interés:
+Se construye entonces un nuevo marco de datos cuyos campos son el centro de interés, la palabra y la disponibilidad calculada, junto con otros datos junto con otros datos relevantes, como la posición y las frecuencias relativas y acumuladas dentro del centro de interés:
 ```{r}
 head(disponibilidad) %>%
   kbl() %>%
   kable_styling(full_width = F)
 ```
-Al ser un marco de datos de R estándard, se pueden realizar sobre el todas las operaciones que permite el sistema, como seleccionar los términos del centro de interés "03", ordenarlos en orden decreciente de disponibilidad y ver los 10 más disponibles
+Al ser un marco de datos de R standar, se pueden realizar sobre él todas las operaciones que permite el sistema. En el siguiente ejemplo se seleccionan los resultados obtenidos en el centro de interés “03”, se han ordenado en orden decreciente de disponibilidad y se muestran los 10 más disponibles
 ```{r}
 disponibilidad %>% 
   filter(centers=="03") %>% 
@@ -98,7 +120,7 @@ disponibilidad %>%
   head(10) %>%
   kbl() %>% kable_styling(full_width = F)
 ```
-O representar la curva de disponibilidad, esto es, la sucesión de valores de disponibilidad, una vez ordenados en valor decreciente de disponibilidad:
+Utilizando las facilidades proporcionadas por R se puede representar la curva de disponibilidad, esto es, la sucesión de valores de disponibilidad, una vez ordenados en valor decreciente de disponibilidad:
 ```{r}
 disponibilidad %>% 
   filter(centers=="03") %>% 
@@ -109,19 +131,18 @@ disponibilidad %>%
 
 ## Modelo de Ávila-Sánchez
 
-Ávila y Sánchez proponen un macro-modelo para el estudio de la disponibilidad, a partir de la Teoría de los Conjuntos Difusos y mediante la modelización de los conceptos que se pretenden representar en estudios. Esta evaluación se produce en dos etapas. En la primera se cuantifica la relevancia de cada término en las pruebas obtenidas para cada hablante y centro de interés según una ley descendente según se avanza en cada listado, y en una segunda etapa se integra esa información con una ley aditiva que integra los distintos valores alcanzados para cada palabra en cada centro de interés.
+Ávila y Sánchez (2014 Fuzzy sets and Prototype Theory: Representational model of cognitive community structures based on lexical availability trials) propusieron un macro-modelo para el estudio de la disponibilidad, a partir de la Teoría de los Conjuntos Difusos y mediante la modelización de los conceptos que se pretenden representar. Esta modelización se produce en dos etapas. En la primera se cuantifica la relevancia de cada término en las pruebas obtenidas para cada hablante y centro de interés según una ley descendente según se avanza en cada listado, y en una segunda etapa se integra esa información con una ley aditiva que integra los distintos valores alcanzados para cada palabra en cada centro de interés.
 
-Hay múltiples posibles elecciones, pero en distintas pruebas pareció más prometedoras las que utilizaban en la primera etapa una ley de Zipf-Mandelbrot y en la segunda una adición probabilística. La interpretación de los valores obtenidos corresponden a la "centralidad" de cada término en el centro de interés. Un valor de uno o muy cercano respondería a la pertenencia al núcleo del vocabulario específico del centro de interés, mientras que una valor próximo a cero indicaría que sería un término poco accesible.
+Hay múltiples posibles elecciones, pero en distintas pruebas pareció más prometedoras las que utilizaban en la primera etapa una ley de Zipf-Mandelbrot y en la segunda una adición probabilística. La interpretación de los valores obtenidos corresponden a la "centralidad" de cada término cada centro de interés. Un valor de 1, o muy cercano, correspondería a la pertenencia al núcleo del vocabulario específico del centro de interés, mientras que una valor próximo a 0 indicaría que sería un término poco accesible.
 
-Se ha implementado una función que lleva a cabo este análisis, `displex_avilasanchez_availability`, que se utiliza de la misma forma que el anterior:
+Ahora se ha implementado una función que lleva a cabo este análisis, `displex_avilasanchez_availability`, que se utiliza de la misma forma que la mostrada anteriormente en el modelo López- Strassburger:
 
 ```{r}
 disponibilidad <- build.avilasanchez.availability(data)
 ```
 
 
-
-Obteniéndose, de nuevo, un nuevo marco de datos con la disponibilidad de cada término en cada cnetro de interés
+El resultado es, de igual modo, un nuevo marco de datos con la disponibilidad de cada término en cada centro de interés
 ```{r}
 disponibilidad %>% 
   filter(centers=="03") %>% 
@@ -139,7 +160,7 @@ disponibilidad %>%
   xlab("Sucesión de palabras") + ylab("Disponibilidad")
 ```
 
-Debido a las características de los operadores aditivos de la teoría de los conjuntos difusos, es posible que la forma de la curva no sea la esperada, no habíendo términos con valoraciones cercanas a uno (por ejemplo, si se tienen pocos datos y relativamente dispersos) o demasiados términos con valoraciones cercanas a uno (por ejemplo, si se tienen muchas muestras). Considerando esta situación, se puede regular la curva mediante un parámetro adicional, $k$, que va a "subir" o "bajar" la curva, pero manteniendo su forma y clasificación. El valor por defecto de $k$ es uno. Si se da un valor entre $0$ y $1$, la curva "bajará" (menos términos con valores cercanos a uno), mientras que si a $k$ se le da un valor mayor que la unidad la curva "subirá" (más términos cercanos a la unidad).
+Debido a las características de los operadores aditivos de la teoría de los conjuntos difusos, es posible que la forma de la curva no sea la esperada:quizás no aparezcan términos con valores cercanos a 1 (por ejemplo, si se tienen pocos datos y estos son relativamente dispersos) o demasiados términos con valoraciones cercanas a 1 (por ejemplo, si se trabaja con muchas muestras). Aunque las opciones anteriores son improbables, pero posibles, hemos optado por permitir la regulación de la curva mediante un parámetro adicional, $k$, que, en último término, va a modificar la curva (ascentente-descendente), pero manteniendo su forma y clasificación. El valor por defecto de $k$ es 1. Si se da un valor entre $0$ y $1$, la curva "bajará" (menos términos con valores cercanos a 1), mientras que si a $k$ se le da un valor mayor que la unidad la curva "subirá" (más términos cercanos a la unidad).
 
 ```{r}
 disponibilidad <- build.avilasanchez.availability(data, k = 0.1)
@@ -150,7 +171,7 @@ disponibilidad %>%
   xlab("Sucesión de palabras") + ylab("Disponibilidad")
 ```
 
-Obteniéndose, de nuevo, un nuevo marco de datos con la disponibilidad de cada término en cada cnetro de interés
+El resultado final será, en cualquier caso, un nuevo marco de datos con la disponibilidad de cada término en cada centro de interés
 ```{r}
 disponibilidad <- build.avilasanchez.availability(data, k = 2)
 disponibilidad %>%
@@ -159,17 +180,14 @@ disponibilidad %>%
   ggplot(aes(x=seq_along(availability), y=availability)) + geom_line() +
   xlab("Sucesión de palabras") + ylab("Disponibilidad")
 ```
-Téngase en cuenta que estos dos ejemplos son a modo de exposición y para valores muy extremos. En nuestras pruebas hemos encontrado que el valor de referencia es lo suficientemente bueno en todos los casos que hemos encontrado.
+Téngase en cuenta que los ejemplos mostrados representan de forma artificial, manipulada y consciente, valores muy extremos a modo de exposición.  En nuestras pruebas, realizadas siempre con datos reales procedentes de investigaciones previas, hemos encontrado que el valor de referencia es lo suficientemente fiable en todos los casos que hemos encontrado.
 
 # Niveles de disponibilidad
 
-Una pregunta recurrente es considerar cual es el tamaño del conjunto de elementos que se consideran que forman parte del núcleo de un centro de interés. Para responder a  esta cuestión, y a partir del marco teórico que se ha utilizado en nuestra propuesta, se proporciona una herramienta que etiqueta los términos en niveles de centralidad. El nivel 0 corresponderían a aquellos elementos que no pertenecen al núcleo, es decir, aquellos términos que no son generalmente accesibles. Los níveles 1, 2, 3, ... y sucesivos representarían un mayor grado de centralidad en el centro de interés.
+Una pregunta recurrente en casi todos los estudios previos de disponibilidad léxica es considerar cuál es el tamaño del conjunto de elementos que se consideran que forman parte del núcleo de un centro de interés. Para responder a  esta cuestión, y a partir del marco teórico utilizado en nuestra propuesta, se proporciona una herramienta que etiqueta los términos en niveles de centralidad. El nivel 0 correspondería a aquellos elementos que no pertenecen al núcleo, es decir, aquellos términos que no son generalmente accesibles. Los níveles 1, 2, 3, ... y sucesivos representarían un mayor grado de centralidad en el centro de interés.
 
 ```{r}
 disponibilidad <- build.avilasanchez.availability(data)
-```
-
-```{r}
 levels <- classify.availability.levels(disponibilidad)
 levels %>% 
   head(20) %>%

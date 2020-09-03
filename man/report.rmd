@@ -1,0 +1,944 @@
+---
+title: "Presentación Displex"
+output:
+  pdf_document: default
+html_notebook: default
+html_document:
+  df_print: paged
+word_document: default
+always_allow_html: yes
+---
+*Store this file in the same directory where your data is stored
+# Carga de librerías
+```{r message = FALSE, warning = FALSE}
+library(tidyverse)
+library(displex)
+```
+# Carga de datos
+```{r}
+data <- read.displex("datos.txt")
+data %>% head()
+```
+
+# Modelo de disponibilidad
+```{r}
+disponibilidad <- build.lopezstrass.availability(data)
+disponibilidad %>% head()
+```
+
+## Centros de interés
+### Centro de interés: 01
+```{r eval=FALSE}
+disponibilidad %>% 
+  filter(centers=="01") %>% 
+  arrange(-availability)
+```
+
+```{r}
+disponibilidad %>% 
+  filter(centers=="01") %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order, y=availability)) + geom_line() +
+  xlab("Sucesión de palabras") + ylab("Disponibilidad")
+```
+
+### Centro de interés: 02
+```{r eval=FALSE}
+disponibilidad %>% 
+  filter(centers=="02") %>% 
+  arrange(-availability)
+```
+
+```{r}
+disponibilidad %>% 
+  filter(centers=="02") %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order, y=availability)) + geom_line() +
+  xlab("Sucesión de palabras") + ylab("Disponibilidad")
+```
+
+### Centro de interés: 03
+```{r eval=FALSE}
+disponibilidad %>% 
+  filter(centers=="03") %>% 
+  arrange(-availability)
+```
+
+```{r}
+disponibilidad %>% 
+  filter(centers=="03") %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order, y=availability)) + geom_line() +
+  xlab("Sucesión de palabras") + ylab("Disponibilidad")
+```
+
+### Centro de interés: 04
+```{r eval=FALSE}
+disponibilidad %>% 
+  filter(centers=="04") %>% 
+  arrange(-availability)
+```
+
+```{r}
+disponibilidad %>% 
+  filter(centers=="04") %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order, y=availability)) + geom_line() +
+  xlab("Sucesión de palabras") + ylab("Disponibilidad")
+```
+
+### Centro de interés: 05
+```{r eval=FALSE}
+disponibilidad %>% 
+  filter(centers=="05") %>% 
+  arrange(-availability)
+```
+
+```{r}
+disponibilidad %>% 
+  filter(centers=="05") %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order, y=availability)) + geom_line() +
+  xlab("Sucesión de palabras") + ylab("Disponibilidad")
+```
+
+### Centro de interés: 06
+```{r eval=FALSE}
+disponibilidad %>% 
+  filter(centers=="06") %>% 
+  arrange(-availability)
+```
+
+```{r}
+disponibilidad %>% 
+  filter(centers=="06") %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order, y=availability)) + geom_line() +
+  xlab("Sucesión de palabras") + ylab("Disponibilidad")
+```
+
+### Centro de interés: 07
+```{r eval=FALSE}
+disponibilidad %>% 
+  filter(centers=="07") %>% 
+  arrange(-availability)
+```
+
+```{r}
+disponibilidad %>% 
+  filter(centers=="07") %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order, y=availability)) + geom_line() +
+  xlab("Sucesión de palabras") + ylab("Disponibilidad")
+```
+
+### Centro de interés: 08
+```{r eval=FALSE}
+disponibilidad %>% 
+  filter(centers=="08") %>% 
+  arrange(-availability)
+```
+
+```{r}
+disponibilidad %>% 
+  filter(centers=="08") %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order, y=availability)) + geom_line() +
+  xlab("Sucesión de palabras") + ylab("Disponibilidad")
+```
+
+### Centro de interés: 09
+```{r eval=FALSE}
+disponibilidad %>% 
+  filter(centers=="09") %>% 
+  arrange(-availability)
+```
+
+```{r}
+disponibilidad %>% 
+  filter(centers=="09") %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order, y=availability)) + geom_line() +
+  xlab("Sucesión de palabras") + ylab("Disponibilidad")
+```
+
+### Centro de interés: 10
+```{r eval=FALSE}
+disponibilidad %>% 
+  filter(centers=="10") %>% 
+  arrange(-availability)
+```
+
+```{r}
+disponibilidad %>% 
+  filter(centers=="10") %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order, y=availability)) + geom_line() +
+  xlab("Sucesión de palabras") + ylab("Disponibilidad")
+```
+
+### Centro de interés: 11
+```{r eval=FALSE}
+disponibilidad %>% 
+  filter(centers=="11") %>% 
+  arrange(-availability)
+```
+
+```{r}
+disponibilidad %>% 
+  filter(centers=="11") %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order, y=availability)) + geom_line() +
+  xlab("Sucesión de palabras") + ylab("Disponibilidad")
+```
+
+### Centro de interés: 12
+```{r eval=FALSE}
+disponibilidad %>% 
+  filter(centers=="12") %>% 
+  arrange(-availability)
+```
+
+```{r}
+disponibilidad %>% 
+  filter(centers=="12") %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order, y=availability)) + geom_line() +
+  xlab("Sucesión de palabras") + ylab("Disponibilidad")
+```
+
+### Centro de interés: 13
+```{r eval=FALSE}
+disponibilidad %>% 
+  filter(centers=="13") %>% 
+  arrange(-availability)
+```
+
+```{r}
+disponibilidad %>% 
+  filter(centers=="13") %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order, y=availability)) + geom_line() +
+  xlab("Sucesión de palabras") + ylab("Disponibilidad")
+```
+
+### Centro de interés: 14
+```{r eval=FALSE}
+disponibilidad %>% 
+  filter(centers=="14") %>% 
+  arrange(-availability)
+```
+
+```{r}
+disponibilidad %>% 
+  filter(centers=="14") %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order, y=availability)) + geom_line() +
+  xlab("Sucesión de palabras") + ylab("Disponibilidad")
+```
+
+### Centro de interés: 15
+```{r eval=FALSE}
+disponibilidad %>% 
+  filter(centers=="15") %>% 
+  arrange(-availability)
+```
+
+```{r}
+disponibilidad %>% 
+  filter(centers=="15") %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order, y=availability)) + geom_line() +
+  xlab("Sucesión de palabras") + ylab("Disponibilidad")
+```
+
+### Centro de interés: 16
+```{r eval=FALSE}
+disponibilidad %>% 
+  filter(centers=="16") %>% 
+  arrange(-availability)
+```
+
+```{r}
+disponibilidad %>% 
+  filter(centers=="16") %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order, y=availability)) + geom_line() +
+  xlab("Sucesión de palabras") + ylab("Disponibilidad")
+```
+
+### Centro de interés: 17
+```{r eval=FALSE}
+disponibilidad %>% 
+  filter(centers=="17") %>% 
+  arrange(-availability)
+```
+
+```{r}
+disponibilidad %>% 
+  filter(centers=="17") %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order, y=availability)) + geom_line() +
+  xlab("Sucesión de palabras") + ylab("Disponibilidad")
+```
+
+### Centro de interés: 18
+```{r eval=FALSE}
+disponibilidad %>% 
+  filter(centers=="18") %>% 
+  arrange(-availability)
+```
+
+```{r}
+disponibilidad %>% 
+  filter(centers=="18") %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order, y=availability)) + geom_line() +
+  xlab("Sucesión de palabras") + ylab("Disponibilidad")
+```
+
+### Centro de interés: 19
+```{r eval=FALSE}
+disponibilidad %>% 
+  filter(centers=="19") %>% 
+  arrange(-availability)
+```
+
+```{r}
+disponibilidad %>% 
+  filter(centers=="19") %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order, y=availability)) + geom_line() +
+  xlab("Sucesión de palabras") + ylab("Disponibilidad")
+```
+
+### Centro de interés: 20
+```{r eval=FALSE}
+disponibilidad %>% 
+  filter(centers=="20") %>% 
+  arrange(-availability)
+```
+
+```{r}
+disponibilidad %>% 
+  filter(centers=="20") %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order, y=availability)) + geom_line() +
+  xlab("Sucesión de palabras") + ylab("Disponibilidad")
+```
+
+## Visión general de los centros de interés
+```{r}
+disponibilidad %>%
+  arrange(-availability) %>% 
+  ggplot(aes(x=order,y=availability)) + geom_line() + facet_wrap(~centers)  +
+  xlab("Secuencia de palabras (por grado descendente de compatibilidad)") + 
+  ylab("Disponibilidad")
+```
+
+# Grupos de compatiblidad
+```{r}
+levels <- classify.availability.levels(disponibilidad)
+```
+
+## Centros de interés
+### Centro de interés: 01
+```{r eval=FALSE}
+levels %>% 
+   arrange(-availability) %>%
+   select(-order)
+```
+ 
+```{r}
+levels %>%
+  filter(centers=="01") %>% 
+  mutate(level=factor(level)) %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order,y=availability,color=level)) + geom_line() +
+  xlab("Posición del término en el centro de interés") +
+  ylab("Disponibilidad")
+```
+
+```{r}
+clasificacion <- build.availability.levels(levels)
+```
+```{r}
+clasificacion %>%
+  filter(levels> 0) %>%
+  filter(centers=="01") %>% 
+```
+```{r eval=FALSE}
+clasificacion %>% 
+  filter(levels == 0) %>%
+  filter(centers=="01") %>% 
+```
+### Centro de interés: 02
+```{r eval=FALSE}
+levels %>% 
+   arrange(-availability) %>%
+   select(-order)
+```
+ 
+```{r}
+levels %>%
+  filter(centers=="02") %>% 
+  mutate(level=factor(level)) %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order,y=availability,color=level)) + geom_line() +
+  xlab("Posición del término en el centro de interés") +
+  ylab("Disponibilidad")
+```
+
+```{r}
+clasificacion <- build.availability.levels(levels)
+```
+```{r}
+clasificacion %>%
+  filter(levels> 0) %>%
+  filter(centers=="02") %>% 
+```
+```{r eval=FALSE}
+clasificacion %>% 
+  filter(levels == 0) %>%
+  filter(centers=="02") %>% 
+```
+### Centro de interés: 03
+```{r eval=FALSE}
+levels %>% 
+   arrange(-availability) %>%
+   select(-order)
+```
+ 
+```{r}
+levels %>%
+  filter(centers=="03") %>% 
+  mutate(level=factor(level)) %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order,y=availability,color=level)) + geom_line() +
+  xlab("Posición del término en el centro de interés") +
+  ylab("Disponibilidad")
+```
+
+```{r}
+clasificacion <- build.availability.levels(levels)
+```
+```{r}
+clasificacion %>%
+  filter(levels> 0) %>%
+  filter(centers=="03") %>% 
+```
+```{r eval=FALSE}
+clasificacion %>% 
+  filter(levels == 0) %>%
+  filter(centers=="03") %>% 
+```
+### Centro de interés: 04
+```{r eval=FALSE}
+levels %>% 
+   arrange(-availability) %>%
+   select(-order)
+```
+ 
+```{r}
+levels %>%
+  filter(centers=="04") %>% 
+  mutate(level=factor(level)) %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order,y=availability,color=level)) + geom_line() +
+  xlab("Posición del término en el centro de interés") +
+  ylab("Disponibilidad")
+```
+
+```{r}
+clasificacion <- build.availability.levels(levels)
+```
+```{r}
+clasificacion %>%
+  filter(levels> 0) %>%
+  filter(centers=="04") %>% 
+```
+```{r eval=FALSE}
+clasificacion %>% 
+  filter(levels == 0) %>%
+  filter(centers=="04") %>% 
+```
+### Centro de interés: 05
+```{r eval=FALSE}
+levels %>% 
+   arrange(-availability) %>%
+   select(-order)
+```
+ 
+```{r}
+levels %>%
+  filter(centers=="05") %>% 
+  mutate(level=factor(level)) %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order,y=availability,color=level)) + geom_line() +
+  xlab("Posición del término en el centro de interés") +
+  ylab("Disponibilidad")
+```
+
+```{r}
+clasificacion <- build.availability.levels(levels)
+```
+```{r}
+clasificacion %>%
+  filter(levels> 0) %>%
+  filter(centers=="05") %>% 
+```
+```{r eval=FALSE}
+clasificacion %>% 
+  filter(levels == 0) %>%
+  filter(centers=="05") %>% 
+```
+### Centro de interés: 06
+```{r eval=FALSE}
+levels %>% 
+   arrange(-availability) %>%
+   select(-order)
+```
+ 
+```{r}
+levels %>%
+  filter(centers=="06") %>% 
+  mutate(level=factor(level)) %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order,y=availability,color=level)) + geom_line() +
+  xlab("Posición del término en el centro de interés") +
+  ylab("Disponibilidad")
+```
+
+```{r}
+clasificacion <- build.availability.levels(levels)
+```
+```{r}
+clasificacion %>%
+  filter(levels> 0) %>%
+  filter(centers=="06") %>% 
+```
+```{r eval=FALSE}
+clasificacion %>% 
+  filter(levels == 0) %>%
+  filter(centers=="06") %>% 
+```
+### Centro de interés: 07
+```{r eval=FALSE}
+levels %>% 
+   arrange(-availability) %>%
+   select(-order)
+```
+ 
+```{r}
+levels %>%
+  filter(centers=="07") %>% 
+  mutate(level=factor(level)) %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order,y=availability,color=level)) + geom_line() +
+  xlab("Posición del término en el centro de interés") +
+  ylab("Disponibilidad")
+```
+
+```{r}
+clasificacion <- build.availability.levels(levels)
+```
+```{r}
+clasificacion %>%
+  filter(levels> 0) %>%
+  filter(centers=="07") %>% 
+```
+```{r eval=FALSE}
+clasificacion %>% 
+  filter(levels == 0) %>%
+  filter(centers=="07") %>% 
+```
+### Centro de interés: 08
+```{r eval=FALSE}
+levels %>% 
+   arrange(-availability) %>%
+   select(-order)
+```
+ 
+```{r}
+levels %>%
+  filter(centers=="08") %>% 
+  mutate(level=factor(level)) %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order,y=availability,color=level)) + geom_line() +
+  xlab("Posición del término en el centro de interés") +
+  ylab("Disponibilidad")
+```
+
+```{r}
+clasificacion <- build.availability.levels(levels)
+```
+```{r}
+clasificacion %>%
+  filter(levels> 0) %>%
+  filter(centers=="08") %>% 
+```
+```{r eval=FALSE}
+clasificacion %>% 
+  filter(levels == 0) %>%
+  filter(centers=="08") %>% 
+```
+### Centro de interés: 09
+```{r eval=FALSE}
+levels %>% 
+   arrange(-availability) %>%
+   select(-order)
+```
+ 
+```{r}
+levels %>%
+  filter(centers=="09") %>% 
+  mutate(level=factor(level)) %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order,y=availability,color=level)) + geom_line() +
+  xlab("Posición del término en el centro de interés") +
+  ylab("Disponibilidad")
+```
+
+```{r}
+clasificacion <- build.availability.levels(levels)
+```
+```{r}
+clasificacion %>%
+  filter(levels> 0) %>%
+  filter(centers=="09") %>% 
+```
+```{r eval=FALSE}
+clasificacion %>% 
+  filter(levels == 0) %>%
+  filter(centers=="09") %>% 
+```
+### Centro de interés: 10
+```{r eval=FALSE}
+levels %>% 
+   arrange(-availability) %>%
+   select(-order)
+```
+ 
+```{r}
+levels %>%
+  filter(centers=="10") %>% 
+  mutate(level=factor(level)) %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order,y=availability,color=level)) + geom_line() +
+  xlab("Posición del término en el centro de interés") +
+  ylab("Disponibilidad")
+```
+
+```{r}
+clasificacion <- build.availability.levels(levels)
+```
+```{r}
+clasificacion %>%
+  filter(levels> 0) %>%
+  filter(centers=="10") %>% 
+```
+```{r eval=FALSE}
+clasificacion %>% 
+  filter(levels == 0) %>%
+  filter(centers=="10") %>% 
+```
+### Centro de interés: 11
+```{r eval=FALSE}
+levels %>% 
+   arrange(-availability) %>%
+   select(-order)
+```
+ 
+```{r}
+levels %>%
+  filter(centers=="11") %>% 
+  mutate(level=factor(level)) %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order,y=availability,color=level)) + geom_line() +
+  xlab("Posición del término en el centro de interés") +
+  ylab("Disponibilidad")
+```
+
+```{r}
+clasificacion <- build.availability.levels(levels)
+```
+```{r}
+clasificacion %>%
+  filter(levels> 0) %>%
+  filter(centers=="11") %>% 
+```
+```{r eval=FALSE}
+clasificacion %>% 
+  filter(levels == 0) %>%
+  filter(centers=="11") %>% 
+```
+### Centro de interés: 12
+```{r eval=FALSE}
+levels %>% 
+   arrange(-availability) %>%
+   select(-order)
+```
+ 
+```{r}
+levels %>%
+  filter(centers=="12") %>% 
+  mutate(level=factor(level)) %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order,y=availability,color=level)) + geom_line() +
+  xlab("Posición del término en el centro de interés") +
+  ylab("Disponibilidad")
+```
+
+```{r}
+clasificacion <- build.availability.levels(levels)
+```
+```{r}
+clasificacion %>%
+  filter(levels> 0) %>%
+  filter(centers=="12") %>% 
+```
+```{r eval=FALSE}
+clasificacion %>% 
+  filter(levels == 0) %>%
+  filter(centers=="12") %>% 
+```
+### Centro de interés: 13
+```{r eval=FALSE}
+levels %>% 
+   arrange(-availability) %>%
+   select(-order)
+```
+ 
+```{r}
+levels %>%
+  filter(centers=="13") %>% 
+  mutate(level=factor(level)) %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order,y=availability,color=level)) + geom_line() +
+  xlab("Posición del término en el centro de interés") +
+  ylab("Disponibilidad")
+```
+
+```{r}
+clasificacion <- build.availability.levels(levels)
+```
+```{r}
+clasificacion %>%
+  filter(levels> 0) %>%
+  filter(centers=="13") %>% 
+```
+```{r eval=FALSE}
+clasificacion %>% 
+  filter(levels == 0) %>%
+  filter(centers=="13") %>% 
+```
+### Centro de interés: 14
+```{r eval=FALSE}
+levels %>% 
+   arrange(-availability) %>%
+   select(-order)
+```
+ 
+```{r}
+levels %>%
+  filter(centers=="14") %>% 
+  mutate(level=factor(level)) %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order,y=availability,color=level)) + geom_line() +
+  xlab("Posición del término en el centro de interés") +
+  ylab("Disponibilidad")
+```
+
+```{r}
+clasificacion <- build.availability.levels(levels)
+```
+```{r}
+clasificacion %>%
+  filter(levels> 0) %>%
+  filter(centers=="14") %>% 
+```
+```{r eval=FALSE}
+clasificacion %>% 
+  filter(levels == 0) %>%
+  filter(centers=="14") %>% 
+```
+### Centro de interés: 15
+```{r eval=FALSE}
+levels %>% 
+   arrange(-availability) %>%
+   select(-order)
+```
+ 
+```{r}
+levels %>%
+  filter(centers=="15") %>% 
+  mutate(level=factor(level)) %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order,y=availability,color=level)) + geom_line() +
+  xlab("Posición del término en el centro de interés") +
+  ylab("Disponibilidad")
+```
+
+```{r}
+clasificacion <- build.availability.levels(levels)
+```
+```{r}
+clasificacion %>%
+  filter(levels> 0) %>%
+  filter(centers=="15") %>% 
+```
+```{r eval=FALSE}
+clasificacion %>% 
+  filter(levels == 0) %>%
+  filter(centers=="15") %>% 
+```
+### Centro de interés: 16
+```{r eval=FALSE}
+levels %>% 
+   arrange(-availability) %>%
+   select(-order)
+```
+ 
+```{r}
+levels %>%
+  filter(centers=="16") %>% 
+  mutate(level=factor(level)) %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order,y=availability,color=level)) + geom_line() +
+  xlab("Posición del término en el centro de interés") +
+  ylab("Disponibilidad")
+```
+
+```{r}
+clasificacion <- build.availability.levels(levels)
+```
+```{r}
+clasificacion %>%
+  filter(levels> 0) %>%
+  filter(centers=="16") %>% 
+```
+```{r eval=FALSE}
+clasificacion %>% 
+  filter(levels == 0) %>%
+  filter(centers=="16") %>% 
+```
+### Centro de interés: 17
+```{r eval=FALSE}
+levels %>% 
+   arrange(-availability) %>%
+   select(-order)
+```
+ 
+```{r}
+levels %>%
+  filter(centers=="17") %>% 
+  mutate(level=factor(level)) %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order,y=availability,color=level)) + geom_line() +
+  xlab("Posición del término en el centro de interés") +
+  ylab("Disponibilidad")
+```
+
+```{r}
+clasificacion <- build.availability.levels(levels)
+```
+```{r}
+clasificacion %>%
+  filter(levels> 0) %>%
+  filter(centers=="17") %>% 
+```
+```{r eval=FALSE}
+clasificacion %>% 
+  filter(levels == 0) %>%
+  filter(centers=="17") %>% 
+```
+### Centro de interés: 18
+```{r eval=FALSE}
+levels %>% 
+   arrange(-availability) %>%
+   select(-order)
+```
+ 
+```{r}
+levels %>%
+  filter(centers=="18") %>% 
+  mutate(level=factor(level)) %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order,y=availability,color=level)) + geom_line() +
+  xlab("Posición del término en el centro de interés") +
+  ylab("Disponibilidad")
+```
+
+```{r}
+clasificacion <- build.availability.levels(levels)
+```
+```{r}
+clasificacion %>%
+  filter(levels> 0) %>%
+  filter(centers=="18") %>% 
+```
+```{r eval=FALSE}
+clasificacion %>% 
+  filter(levels == 0) %>%
+  filter(centers=="18") %>% 
+```
+### Centro de interés: 19
+```{r eval=FALSE}
+levels %>% 
+   arrange(-availability) %>%
+   select(-order)
+```
+ 
+```{r}
+levels %>%
+  filter(centers=="19") %>% 
+  mutate(level=factor(level)) %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order,y=availability,color=level)) + geom_line() +
+  xlab("Posición del término en el centro de interés") +
+  ylab("Disponibilidad")
+```
+
+```{r}
+clasificacion <- build.availability.levels(levels)
+```
+```{r}
+clasificacion %>%
+  filter(levels> 0) %>%
+  filter(centers=="19") %>% 
+```
+```{r eval=FALSE}
+clasificacion %>% 
+  filter(levels == 0) %>%
+  filter(centers=="19") %>% 
+```
+### Centro de interés: 20
+```{r eval=FALSE}
+levels %>% 
+   arrange(-availability) %>%
+   select(-order)
+```
+ 
+```{r}
+levels %>%
+  filter(centers=="20") %>% 
+  mutate(level=factor(level)) %>% 
+  arrange(-availability) %>% 
+  ggplot(aes(x=order,y=availability,color=level)) + geom_line() +
+  xlab("Posición del término en el centro de interés") +
+  ylab("Disponibilidad")
+```
+
+```{r}
+clasificacion <- build.availability.levels(levels)
+```
+```{r}
+clasificacion %>%
+  filter(levels> 0) %>%
+  filter(centers=="20") %>% 
+```
+```{r eval=FALSE}
+clasificacion %>% 
+  filter(levels == 0) %>%
+  filter(centers=="20") %>% 
+```
