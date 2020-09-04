@@ -242,5 +242,12 @@ levels %>%
   ylab("Disponibilidad")
 ```
 
+# Herramienta propuesta
 
+Para facilitar el acceso a las herramientas propuestas se ha dispuesto un pequeño entorno gráfico que construye un documento inicial con el que poder empezar a trabajar. El uso de este entorno requiere el uso de librerías adicionales, que incorpora las posibilidades de la gestión de interfaces de usuario
+```{r eval=FALSE}
+install.packages("shiny")
+install.packages("rstudioapi", type = "source")
+```
+El proceso de instalación de esta herramienta puede ser muy largo.
 

@@ -1,0 +1,4 @@
+Name: New displex document
+Description: Create a new displex document
+Binding: displex.new.document
+Interactive: false
