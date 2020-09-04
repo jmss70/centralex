@@ -148,7 +148,7 @@ build.availability.levels <- function(data) {
   dmt <- data.frame(mt)
   names(dmt) <- colnames(mt)
   dmt$centers <- rownames(dmt)
-  dmt <- dmt %>% pivot_longer(-centers,names_to="levels", values_to="words") %>% mutate(levels=strtoi(levels))
+  dmt <- dmt %>% pivot_longer(-centers,names_to="level", values_to="words") %>% mutate(levels=strtoi(levels))
   dmt$count <- lapply(dmt$words, function(x) {length(unlist(x))}) %>% unlist
-  dmt %>% select(centers,levels,count,words) %>% arrange(centers,-levels)
+  dmt %>% select(centers,level,count,words) %>% arrange(centers,-level)
 }
