@@ -1,5 +1,5 @@
 ---
-title: "Presentación Displex"
+title: "Presentación centralex"
 output:
   pdf_document: default
   html_notebook: default
@@ -36,11 +36,11 @@ Para el uso de esta herramienta es obligatorio la instalación del sistema R y s
 
 Una vez instalada la aplicación RStudio, para poder utilizar las herramientas que proponemos,  el usuario debe llevar a cabo un  paso previo de instalación que, en nuestra opinión, no es más complejo que cualquier proceso de instalación en el sistema R. Este paso ha de hacerse únicamente cuando se pretenda instalar o actualizar el paquete en el sistema. Puesto que nuestra intención es seguir trabajando en el paquete, sería recomendable realizar esta acción de forma periódica o, al menos, a medida que se vayan actualizando funcionalidades a las ahora presentadas.
 
-Las siguientes órdenes instalan el paquete Displex del repositorio GitHub. Todo el código está implementado en R, con lo que es fácil de revisar.
+Las siguientes órdenes instalan el paquete centralex del repositorio GitHub. Todo el código está implementado en R, con lo que es fácil de revisar.
 ```{r eval=FALSE}
 install.packages("devtools")
 library(devtools)
-install_github("jmss70/displex")
+install_github("jmss70/centralex")
 ```
 
 Para instalar las herramientas del universo Tidyverse se utiliza la orden:
@@ -62,7 +62,7 @@ Una vez que se han llevado a cabo los pasos anteriores, y si no se ha producido 
 
 En los pasos anteriores se han instalado en nuestro sistema las librerías que proporcionan diversas funcionalidades. Pero, para poderlas usarlas hay que cargarlas en la sesión de trabajo. Esto se consigue mediante:
 ```{r message = FALSE, warning = FALSE}
-library(displex)
+library(centralex)
 library(kableExtra)
 library(tidyverse)
 ```
@@ -85,7 +85,7 @@ Un ejemplo de dos líneas sería:
 Suponiendo que tenemos todos los datos cargados en un archivo, denominado `datos.txt`, que estará alojado en el mismo directorio que el script de procesamiento, se podrían cargar los datos como:
 
 ```{r}
-data <- read.displex("datos.txt")
+data <- read.centralex("datos.txt")
 data %>% 
   head() %>% 
   kbl()  %>% 
@@ -97,7 +97,7 @@ data %>%
 
 # Cálculo de la disponibilidad
 
-La función general del cálculo de la disponibilidad es `displex_availability`. Sin embargo, el uso de esta función requiere del uso de varios parámetros. Se han construidos dos funciones de utilidad que encapsulan su uso y ofrecen los dos modelos que consideramos, por el momento, más interesantes (Modelo López-Strassburger y Modelo Ávila-Sánchez). Consideramos que es preferible exponer su uso mediante ejemplos.
+La función general del cálculo de la disponibilidad es `centralex_availability`. Sin embargo, el uso de esta función requiere del uso de varios parámetros. Se han construidos dos funciones de utilidad que encapsulan su uso y ofrecen los dos modelos que consideramos, por el momento, más interesantes (Modelo López-Strassburger y Modelo Ávila-Sánchez). Consideramos que es preferible exponer su uso mediante ejemplos.
 
 ## Modelo de López-Strassburger
 
@@ -135,7 +135,7 @@ disponibilidad %>%
 
 Hay múltiples posibles elecciones, pero en distintas pruebas pareció más prometedoras las que utilizaban en la primera etapa una ley de Zipf-Mandelbrot y en la segunda una adición probabilística. La interpretación de los valores obtenidos corresponden a la "centralidad" de cada término cada centro de interés. Un valor de 1, o muy cercano, correspondería a la pertenencia al núcleo del vocabulario específico del centro de interés, mientras que una valor próximo a 0 indicaría que sería un término poco accesible.
 
-Ahora se ha implementado una función que lleva a cabo este análisis, `displex_avilasanchez_availability`, que se utiliza de la misma forma que la mostrada anteriormente en el modelo López- Strassburger:
+Ahora se ha implementado una función que lleva a cabo este análisis, `centralex_avilasanchez_availability`, que se utiliza de la misma forma que la mostrada anteriormente en el modelo López- Strassburger:
 
 ```{r}
 disponibilidad <- build.avilasanchez.availability(data)
